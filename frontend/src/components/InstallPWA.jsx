@@ -16,7 +16,7 @@ function InstallPWA() {
     const handleAppInstalled = () => {
       setDeferredPrompt(null);
       setShowButton(false);
-      console.log('ФлоуХаб установлен!');
+      console.log('ЗипТап установлен!');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);

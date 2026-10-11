@@ -1,5 +1,5 @@
-/* Service Worker для ФлоуХаб */
-const CACHE_NAME = 'flowhub-v2';
+/* Service Worker для ЗипТап */
+const CACHE_NAME = 'ZipTap-v2';
 const URLS_TO_CACHE = [
   '/',
   '/manifest.json',

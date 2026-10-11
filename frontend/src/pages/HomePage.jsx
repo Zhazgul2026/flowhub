@@ -74,7 +74,7 @@ function HomePage() {
   return (
     <div className="page-container">
       <div className="hero">
-        <h1 className="hero-title">ФлоуХаб</h1>
+        <h1 className="hero-title">ЗипТап</h1>
         <p className="hero-text">Поток сделок. Центр притяжения.</p>
         <Link to="/create" className="hero-button">Подать объявление</Link>
       </div>
@@ -224,7 +224,7 @@ function HomePage() {
       <footer style={styles.footer}>
         <div style={styles.footerContent}>
           <div>
-            <h3 style={styles.footerTitle}>ФлоуХаб</h3>
+            <h3 style={styles.footerTitle}>ЗипТап</h3>
             <p style={styles.footerText}>Поток сделок. Центр притяжения.</p>
           </div>
           <div>
@@ -238,7 +238,7 @@ function HomePage() {
           </div>
         </div>
         <div style={styles.footerBottom}>
-          © 2026 ФлоуХаб. Все права принадлежат Крымской Жазгул Темеркановне.
+          © 2026 ЗипТап. Все права принадлежат Крымской Жазгул Темеркановне.
         </div>
       </footer>
     </div>

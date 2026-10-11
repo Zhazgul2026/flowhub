@@ -43,7 +43,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'flowhub.urls'
+ROOT_URLCONF = 'ZipTap'.urls'
 
 TEMPLATES = [
     {
@@ -61,7 +61,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'flowhub.wsgi.application'
+WSGI_APPLICATION = 'ZipTap.wsgi.application'
 
 DATABASES = {
     'default': {

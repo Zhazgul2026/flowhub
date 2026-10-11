@@ -1,21 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
-  <!-- Иконка: волна + хаб -->
+  <!-- Молния -->
   <g transform="translate(5, 5)">
-    <!-- Волна -->
-    <path d="M 5 25 Q 15 10, 25 25 T 45 25" 
-          stroke="#00D4FF" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <!-- Хаб (точка) -->
-    <circle cx="25" cy="25" r="4" fill="#00D4FF"/>
-    <!-- Вторая волна (эхо) -->
-    <path d="M 5 35 Q 15 25, 25 35 T 45 35" 
-          stroke="#00D4FF" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M 25 0 L 10 25 L 20 25 L 15 45 L 35 20 L 25 20 L 30 0 Z" 
+          fill="#00D4FF" stroke="#0b3b4a" stroke-width="1"/>
   </g>
   
   <!-- Текст -->
-  <text x="65" y="38" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#00D4FF">
-    Флоу
+  <text x="50" y="38" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#00D4FF">
+    Зип
   </text>
-  <text x="130" y="38" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#ffffff">
-    Хаб
+  <text x="97" y="38" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#ffffff">
+    Тап
   </text>
 </svg>

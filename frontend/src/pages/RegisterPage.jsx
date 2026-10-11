@@ -36,7 +36,7 @@ function RegisterPage() {
   return (
     <div className="form-container">
       <h1 className="form-title">✨ Регистрация</h1>
-      <p className="form-subtitle">Создайте аккаунт во ФлоуХабе</p>
+      <p className="form-subtitle">Создайте аккаунт во ЗипТапе</p>
 
       {error && <div className="form-error">{error}</div>}
 

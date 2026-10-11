@@ -35,7 +35,7 @@ function Header() {
     <header className="site-header">
       <div className="header-container">
         <Link to="/" className="logo-link" onClick={closeMenu}>
-          <img src="/logo.svg" alt="ФлоуХаб" className="logo-image" />
+      <img src="/logo.svg" alt="ЗипТап" className="logo-image" />
         </Link>
 
         <button
