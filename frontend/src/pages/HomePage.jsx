@@ -91,7 +91,7 @@ function HomePage() {
               }}
               className="category-card"
               style={{
-                borderColor: selectedCategory === cat.id ? '#00D4FF' : '#e0e0e0',
+                borderColor: selectedCategory === cat.id ? '#00F0FF' : '#e0e0e0',
                 backgroundColor: selectedCategory === cat.id ? '#e6f7ff' : '#fff',
               }}
             >
@@ -247,7 +247,7 @@ function HomePage() {
 
 const styles = {
   section: { marginBottom: '50px' },
-  sectionTitle: { fontSize: '28px', marginBottom: '20px', color: '#0b3b4a' },
+  sectionTitle: { fontSize: '28px', marginBottom: '20px', color: '#1a1a2e' },
   filterTitle: { margin: '0 0 15px', fontSize: '20px' },
   label: { display: 'block', fontSize: '13px', color: '#666', margin: '12px 0 5px' },
   input: { width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px', boxSizing: 'border-box' },
@@ -258,25 +258,25 @@ const styles = {
   main: { minWidth: 0 },
   topBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#666', flexWrap: 'wrap', gap: '10px' },
   sortSelect: { padding: '6px 10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px' },
-  card: { backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '12px', overflow: 'hidden', textDecoration: 'none', color: '#333', position: 'relative', display: 'flex', flexDirection: 'column' },
+  card: { backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '12px', overflow: 'hidden', textDecoration: 'none', color: '#1a1a2e', position: 'relative', display: 'flex', flexDirection: 'column' },
   cardImage: { width: '100%', height: '150px', objectFit: 'cover' },
   imagePlaceholder: { backgroundColor: '#f0f7fa', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px' },
   cardBody: { padding: '12px', flex: 1, display: 'flex', flexDirection: 'column' },
   cardTitle: { fontSize: '15px', margin: '0 0 8px', minHeight: '38px', overflow: 'hidden' },
-  cardPrice: { fontSize: '20px', fontWeight: 'bold', color: '#0b3b4a', margin: '0 0 5px' },
+  cardPrice: { fontSize: '20px', fontWeight: 'bold', color: '#1a1a2e', margin: '0 0 5px' },
   cardCategory: { fontSize: '12px', color: '#888', margin: '0 0 12px' },
   cardFooter: { display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#666', marginTop: 'auto' },
-  wholesaleBadge: { position: 'absolute', top: '8px', right: '8px', backgroundColor: '#00D4FF', color: '#0b3b4a', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' },
+  wholesaleBadge: { position: 'absolute', top: '8px', right: '8px', backgroundColor: '#00F0FF', color: '#1a1a2e', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' },
   howSection: { marginBottom: '50px', padding: '40px 20px', backgroundColor: '#f9f9f9', borderRadius: '12px' },
   howGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' },
   howCard: { textAlign: 'center', padding: '20px' },
   howIcon: { fontSize: '40px', marginBottom: '10px' },
-  howTitle: { fontSize: '18px', margin: '0 0 8px', color: '#0b3b4a' },
+  howTitle: { fontSize: '18px', margin: '0 0 8px', color: '#1a1a2e' },
   howText: { fontSize: '14px', color: '#666', lineHeight: '1.5' },
-  footer: { marginTop: '60px', padding: '30px 20px 15px', backgroundColor: '#0b3b4a', color: '#fff', borderRadius: '12px' },
+  footer: { marginTop: '60px', padding: '30px 20px 15px', backgroundColor: '#1a1a2e', color: '#fff', borderRadius: '12px' },
   footerContent: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px', marginBottom: '20px' },
-  footerTitle: { margin: '0 0 10px', color: '#00D4FF' },
-  footerHeading: { fontSize: '15px', margin: '0 0 10px', color: '#00D4FF' },
+  footerTitle: { margin: '0 0 10px', color: '#00F0FF' },
+  footerHeading: { fontSize: '15px', margin: '0 0 10px', color: '#00F0FF' },
   footerText: { fontSize: '13px', color: '#ccc', margin: '0 0 8px' },
   footerLink: { display: 'block', color: '#fff', textDecoration: 'none', fontSize: '13px', marginBottom: '6px' },
   footerBottom: { borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '15px', fontSize: '12px', color: '#aaa', textAlign: 'center' },

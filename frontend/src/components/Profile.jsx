@@ -61,8 +61,8 @@ function Profile() {
 
 const styles = {
   actions: { marginTop: '25px', display: 'flex', flexDirection: 'column', gap: '10px' },
-  primaryButton: { display: 'block', textAlign: 'center', padding: '14px', backgroundColor: '#0b3b4a', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px' },
-  secondaryButton: { display: 'block', textAlign: 'center', padding: '14px', backgroundColor: '#e6f7ff', color: '#0b3b4a', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px' },
+  primaryButton: { display: 'block', textAlign: 'center', padding: '14px', backgroundColor: '#1a1a2e', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px' },
+  secondaryButton: { display: 'block', textAlign: 'center', padding: '14px', backgroundColor: '#e6f7ff', color: '#1a1a2e', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px' },
 };
 
 export default Profile;

@@ -79,14 +79,14 @@ function ChatsPage() {
 
 const styles = {
   container: { maxWidth: '800px', margin: '30px auto', padding: '0 20px' },
-  title: { fontSize: '28px', marginBottom: '20px', color: '#0b3b4a' },
+  title: { fontSize: '28px', marginBottom: '20px', color: '#1a1a2e' },
   empty: { textAlign: 'center', padding: '60px 20px', backgroundColor: '#f9f9f9', borderRadius: '12px', color: '#666' },
   emptyHint: { fontSize: '14px', marginTop: '10px', color: '#999' },
   list: { display: 'flex', flexDirection: 'column', gap: '12px' },
-  chatCard: { display: 'block', padding: '18px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e0e0e0', textDecoration: 'none', color: '#333', position: 'relative' },
+  chatCard: { display: 'block', padding: '18px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e0e0e0', textDecoration: 'none', color: '#1a1a2e', position: 'relative' },
   chatHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
-  chatTitle: { fontSize: '17px', fontWeight: 'bold', color: '#0b3b4a' },
-  unreadBadge: { backgroundColor: '#00D4FF', color: '#0b3b4a', padding: '3px 10px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold' },
+  chatTitle: { fontSize: '17px', fontWeight: 'bold', color: '#1a1a2e' },
+  unreadBadge: { backgroundColor: '#00F0FF', color: '#1a1a2e', padding: '3px 10px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold' },
   chatInfo: { fontSize: '14px', color: '#666', marginBottom: '8px' },
   lastMessage: { fontSize: '14px', color: '#888', fontStyle: 'italic', marginBottom: '6px' },
   chatDate: { fontSize: '12px', color: '#aaa', textAlign: 'right' },

@@ -191,7 +191,7 @@ function CreateAdvert() {
 
 const styles = {
   container: { maxWidth: '600px', margin: '40px auto', padding: '30px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' },
-  title: { margin: '0 0 5px', fontSize: '28px', color: '#0b3b4a' },
+  title: { margin: '0 0 5px', fontSize: '28px', color: '#1a1a2e' },
   subtitle: { margin: '0 0 20px', color: '#666', fontSize: '14px' },
   form: { display: 'flex', flexDirection: 'column' },
   label: { fontSize: '13px', color: '#666', marginTop: '12px', marginBottom: '4px' },
@@ -204,7 +204,7 @@ const styles = {
   row: { display: 'flex', gap: '15px' },
   col: { flex: 1, display: 'flex', flexDirection: 'column' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px', fontSize: '14px', cursor: 'pointer' },
-  button: { marginTop: '25px', backgroundColor: '#0b3b4a', color: '#fff', padding: '14px', borderRadius: '8px', border: 'none', fontSize: '16px', cursor: 'pointer', fontWeight: 'bold' },
+  button: { marginTop: '25px', backgroundColor: '#1a1a2e', color: '#fff', padding: '14px', borderRadius: '8px', border: 'none', fontSize: '16px', cursor: 'pointer', fontWeight: 'bold' },
   error: { backgroundColor: '#fde8e8', color: '#c0392b', padding: '12px', borderRadius: '6px', marginBottom: '15px', fontSize: '13px', whiteSpace: 'pre-line' },
 };
 
