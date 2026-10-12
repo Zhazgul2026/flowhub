@@ -1,14 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
-  <!-- Молния -->
+  <!-- Стилизованная молния (более динамичная форма) -->
   <g transform="translate(5, 5)">
-    <path d="M 25 0 L 10 25 L 20 25 L 15 45 L 35 20 L 25 20 L 30 0 Z" 
-          fill="#00D4FF" stroke="#0b3b4a" stroke-width="1"/>
+    <path d="M 22 0 L 8 24 L 18 24 L 12 46 L 32 18 L 22 18 L 28 0 Z"
+          fill="#00F0FF"
+          stroke="#00F0FF"
+          stroke-width="1.5"
+          stroke-linejoin="round"/>
   </g>
-  
-  <!-- Текст -->
-  <text x="50" y="38" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#00D4FF">
+
+  <!-- Текст "Зип" (неоновый) -->
+  <text x="50" y="38" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#00F0FF">
     Зип
   </text>
+  <!-- Текст "Тап" (белый) -->
   <text x="97" y="38" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#ffffff">
     Тап
   </text>
