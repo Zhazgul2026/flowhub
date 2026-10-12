@@ -9,6 +9,7 @@ import AdvertDetail from './components/AdvertDetail';
 import CreateAdvert from './components/CreateAdvert';
 import Profile from './components/Profile';
 import VerifyPage from './pages/VerifyPage';
+import EditAdvertPage from './pages/EditAdvertPage';
 import Header from './components/Header';
 import InstallPWA from './components/InstallPWA';
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/create" element={<CreateAdvert />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/verify" element={<VerifyPage />} />
+        <Route path="/edit/:id" element={<EditAdvertPage />} />
         <Route path="/chats" element={<ChatsPage />} />
         <Route path="/chat/:id" element={<ChatPage />} />
       </Routes>

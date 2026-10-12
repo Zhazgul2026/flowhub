@@ -30,6 +30,16 @@ export const createAdvert = (data) => {
       : { 'Content-Type': 'application/json' },
   });
 };
+export const updateAdvert = (id, data) => {
+  const isFormData = data instanceof FormData;
+  return api.patch(`/adverts/${id}/`, data, {
+    headers: isFormData
+      ? { 'Content-Type': 'multipart/form-data' }
+      : { 'Content-Type': 'application/json' },
+  });
+};
+
+export const deleteAdvert = (id) => api.delete(`/adverts/${id}/`);
 export const getAdvert = (id) => api.get(`/adverts/${id}/`);
 export const boostAdvert = (id) => api.post(`/adverts/${id}/boost/`);
 export const getCategories = () => api.get('/adverts/categories/');

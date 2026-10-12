@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAdvert, createChat } from '../services/api';
+import { getAdvert, createChat, deleteAdvert } from '../services/api';
 import BackButton from './BackButton';
 
 function AdvertDetail() {
@@ -46,8 +46,24 @@ function AdvertDetail() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Удалить объявление? Это действие нельзя отменить.')) return;
+    try {
+      await deleteAdvert(advert.id);
+      alert('Объявление удалено');
+      navigate('/');
+    } catch (err) {
+      alert('Ошибка при удалении');
+    }
+  };
+
+  const handleEdit = () => {
+    navigate(`/edit/${advert.id}`);
+  };
+
   if (!advert) return <p style={{ padding: '20px' }}>Загрузка...</p>;
 
+  const isOwner = advert.user_username === currentUser;
   const formatPrice = (price) => new Intl.NumberFormat('ru-RU').format(price);
 
   return (
@@ -104,8 +120,15 @@ function AdvertDetail() {
           <div className="advert-seller">
             <h3 className="advert-section-title">Продавец</h3>
             <p className="advert-seller-name">👤 {advert.user_username}</p>
-            {advert.user_username === currentUser ? (
-              <p className="advert-own">Это ваше объявление</p>
+            {isOwner ? (
+              <div style={styles.ownerActions}>
+                <button onClick={handleEdit} style={styles.editButton}>
+                  ✏️ Редактировать
+                </button>
+                <button onClick={handleDelete} style={styles.deleteButton}>
+                  🗑️ Удалить
+                </button>
+              </div>
             ) : (
               <button
                 onClick={handleContact}
@@ -136,5 +159,36 @@ function AdvertDetail() {
     </>
   );
 }
+
+const styles = {
+  ownerActions: { display: 'flex', gap: '10px', flexWrap: 'wrap' },
+  editButton: {
+    flex: 1,
+    minWidth: '140px',
+    padding: '14px',
+    backgroundColor: '#00F0FF',
+    color: '#1a1a2e',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: 'bold',
+    fontFamily: 'inherit',
+    boxShadow: '0 0 15px rgba(0, 240, 255, 0.4)',
+  },
+  deleteButton: {
+    flex: 1,
+    minWidth: '140px',
+    padding: '14px',
+    backgroundColor: '#FF4444',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: 'bold',
+    fontFamily: 'inherit',
+  },
+};
 
 export default AdvertDetail;
