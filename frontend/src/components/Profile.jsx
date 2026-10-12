@@ -57,6 +57,9 @@ function Profile() {
       <div style={styles.actions}>
         <Link to="/create" style={styles.primaryButton}>➕ Подать объявление</Link>
         <Link to="/chats" style={styles.secondaryButton}>💬 Мои чаты</Link>
+        {user.user_type === 'registered' && (
+          <Link to="/verify" style={styles.verifyButton}>✅ Пройти верификацию</Link>
+        )}
       </div>
     </div>
   );
@@ -64,8 +67,40 @@ function Profile() {
 
 const styles = {
   actions: { marginTop: '25px', display: 'flex', flexDirection: 'column', gap: '10px' },
-  primaryButton: { display: 'block', textAlign: 'center', padding: '14px', backgroundColor: '#1a1a2e', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px' },
-  secondaryButton: { display: 'block', textAlign: 'center', padding: '14px', backgroundColor: '#e6f7ff', color: '#1a1a2e', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px' },
+  primaryButton: {
+    display: 'block',
+    textAlign: 'center',
+    padding: '14px',
+    backgroundColor: '#1a1a2e',
+    color: '#fff',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    fontSize: '15px',
+  },
+  secondaryButton: {
+    display: 'block',
+    textAlign: 'center',
+    padding: '14px',
+    backgroundColor: '#e6f7ff',
+    color: '#1a1a2e',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    fontSize: '15px',
+  },
+  verifyButton: {
+    display: 'block',
+    textAlign: 'center',
+    padding: '14px',
+    backgroundColor: '#00F0FF',
+    color: '#1a1a2e',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    fontSize: '15px',
+    boxShadow: '0 0 15px rgba(0, 240, 255, 0.5)',
+  },
 };
 
 export default Profile;

@@ -17,6 +17,22 @@ class WholesaleOrderListCreateView(generics.ListCreateAPIView):
             models.Q(buyer=user) | models.Q(advert__user=user)
         ).distinct()
 
+    def create(self, request, *args, **kwargs):
+        # Проверка лимита для частников
+        user = request.user
+        if user.user_type == 'verified_private':
+            total_price = request.data.get('total_price', 0)
+            try:
+                total_price = float(total_price)
+            except (ValueError, TypeError):
+                total_price = 0
+            if total_price > 100000:
+                return Response(
+                    {'error': 'Для частников лимит оптовой сделки — 100 000 ₽. Пройдите верификацию как ИП или юрлицо.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        return super().create(request, *args, **kwargs)
+
 class WholesaleOrderDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = WholesaleOrderSerializer
     permission_classes = (permissions.IsAuthenticated,)
