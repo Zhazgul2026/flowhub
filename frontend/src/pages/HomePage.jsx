@@ -65,7 +65,7 @@ function HomePage() {
     'Электроника': '📱',
     'Одежда и обувь': '👕',
     'Дом и сад': '🏡',
-    'Работа и услуги': '🔧',
+    'Работа и услуги': '💼',
     'Животные': '🐾',
     'Хобби и отдых': '🎨',
     'Коллекции и антиквариат': '🏺',
@@ -85,14 +85,12 @@ function HomePage() {
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => {
-                setSelectedCategory(cat.id);
-                window.scrollTo({ top: 500, behavior: 'smooth' });
-              }}
+              onClick={() => setSelectedCategory(cat.id)}
               className="category-card"
               style={{
                 borderColor: selectedCategory === cat.id ? '#00F0FF' : '#e0e0e0',
                 backgroundColor: selectedCategory === cat.id ? '#e6f7ff' : '#fff',
+                boxShadow: selectedCategory === cat.id ? '0 0 15px rgba(0, 240, 255, 0.5)' : 'none',
               }}
             >
               <span className="category-icon">{categoryIcons[cat.name] || '📦'}</span>
@@ -106,7 +104,7 @@ function HomePage() {
         <h2 style={styles.sectionTitle}>Объявления</h2>
         <div className="layout-grid">
           <aside className="sidebar">
-            <h3 style={styles.filterTitle}>Фильтры</h3>
+            <h3 style={styles.filterTitle}>🔧 Фильтры</h3>
 
             <label style={styles.label}>Поиск</label>
             <input
@@ -258,7 +256,7 @@ const styles = {
   main: { minWidth: 0 },
   topBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#666', flexWrap: 'wrap', gap: '10px' },
   sortSelect: { padding: '6px 10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px' },
-  card: { backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '12px', overflow: 'hidden', textDecoration: 'none', color: '#1a1a2e', position: 'relative', display: 'flex', flexDirection: 'column' },
+  card: { backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '12px', overflow: 'hidden', textDecoration: 'none', color: '#333', position: 'relative', display: 'flex', flexDirection: 'column' },
   cardImage: { width: '100%', height: '150px', objectFit: 'cover' },
   imagePlaceholder: { backgroundColor: '#f0f7fa', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px' },
   cardBody: { padding: '12px', flex: 1, display: 'flex', flexDirection: 'column' },

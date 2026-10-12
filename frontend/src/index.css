@@ -608,4 +608,46 @@ img {
   .form-title { font-size: 22px; }
 
   .install-button { bottom: 15px; right: 15px; padding: 12px 18px; font-size: 14px; }
+}/* ============ КНОПКА НАЗАД ============ */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: transparent;
+  border: 2px solid #00F0FF;
+  border-radius: 8px;
+  color: #00F0FF;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background-color: #00F0FF;
+  color: #1a1a2e;
+  transform: translateX(-3px);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+}
+
+.back-arrow {
+  font-size: 18px;
+  transition: transform 0.2s;
+}
+
+.back-button:hover .back-arrow {
+  transform: translateX(-3px);
+}
+
+@media (max-width: 600px) {
+  .back-button {
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+  .back-arrow {
+    font-size: 16px;
+  }
 }

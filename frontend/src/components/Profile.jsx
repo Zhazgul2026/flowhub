@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getProfile } from '../services/api';
+import BackButton from './BackButton';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -18,6 +19,7 @@ function Profile() {
 
   return (
     <div className="form-container">
+      <BackButton text="На главную" to="/" />
       <h1 className="form-title">👤 Мой профиль</h1>
       <p className="form-subtitle">Информация о вашем аккаунте</p>
 

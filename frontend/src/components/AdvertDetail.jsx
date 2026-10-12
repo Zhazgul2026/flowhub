@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getAdvert, createChat } from '../services/api';
+import BackButton from './BackButton';
 
 function AdvertDetail() {
   const { id } = useParams();
@@ -51,6 +52,7 @@ function AdvertDetail() {
 
   return (
     <div className="advert-detail">
+      <BackButton text="Назад к объявлениям" to="/" />
       <div className="advert-image-block">
         {advert.image_url ? (
           <img
