@@ -238,7 +238,7 @@ function HomePage() {
           </div>
         </div>
         <div style={styles.footerBottom}>
-          © 2026 ЗипТап. Все права принадлежат Крымской Жазгул Темеркановне.
+          © 2026 ЗипТап. Все права защищены.
         </div>
       </footer>
     </div>
