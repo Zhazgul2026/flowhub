@@ -51,84 +51,89 @@ function AdvertDetail() {
   const formatPrice = (price) => new Intl.NumberFormat('ru-RU').format(price);
 
   return (
-    <div className="advert-detail">
-      <BackButton text="Назад к объявлениям" to="/" />
-      <div className="advert-image-block">
-        {advert.image_url ? (
-          <img
-            src={advert.image_url}
-            alt={advert.title}
-            className="advert-image"
-            onClick={() => setLightbox(true)}
-          />
-        ) : (
-          <div className="advert-image-placeholder">📦</div>
-        )}
-        {advert.is_wholesale && <span className="advert-wholesale-badge">ОПТ</span>}
+    <>
+      <div style={{ maxWidth: '1000px', margin: '20px auto 0', padding: '0 20px' }}>
+        <BackButton text="Назад к объявлениям" to="/" />
       </div>
 
-      <div className="advert-content">
-        <h1 className="advert-title">{advert.title}</h1>
-        <p className="advert-price">{formatPrice(advert.price)} ₽</p>
-        {advert.quantity > 1 && (
-          <p className="advert-quantity">В наличии: {advert.quantity} шт.</p>
-        )}
-        <p className="advert-category">Категория: {advert.category_name || '—'}</p>
-
-        <div className="advert-block">
-          <h3 className="advert-section-title">Описание</h3>
-          <p className="advert-description">{advert.description}</p>
+      <div className="advert-detail">
+        <div className="advert-image-block">
+          {advert.image_url ? (
+            <img
+              src={advert.image_url}
+              alt={advert.title}
+              className="advert-image"
+              onClick={() => setLightbox(true)}
+            />
+          ) : (
+            <div className="advert-image-placeholder">📦</div>
+          )}
+          {advert.is_wholesale && <span className="advert-wholesale-badge">ОПТ</span>}
         </div>
 
-        {advert.is_wholesale && (
-          <div className="advert-wholesale-block">
-            <h3>Оптовое предложение</h3>
-            <p>Доступно для верифицированных пользователей и бизнеса.</p>
-            {advert.wholesale_conditions && (
-              <ul className="advert-wholesale-list">
-                <li>Предоплата: {advert.wholesale_conditions.prepayment}%</li>
-                <li>
-                  {advert.wholesale_conditions.only_business
-                    ? 'Только для бизнеса'
-                    : 'Доступно и частным лицам'}
-                </li>
-              </ul>
+        <div className="advert-content">
+          <h1 className="advert-title">{advert.title}</h1>
+          <p className="advert-price">{formatPrice(advert.price)} ₽</p>
+          {advert.quantity > 1 && (
+            <p className="advert-quantity">В наличии: {advert.quantity} шт.</p>
+          )}
+          <p className="advert-category">Категория: {advert.category_name || '—'}</p>
+
+          <div className="advert-block">
+            <h3 className="advert-section-title">Описание</h3>
+            <p className="advert-description">{advert.description}</p>
+          </div>
+
+          {advert.is_wholesale && (
+            <div className="advert-wholesale-block">
+              <h3>Оптовое предложение</h3>
+              <p>Доступно для верифицированных пользователей и бизнеса.</p>
+              {advert.wholesale_conditions && (
+                <ul className="advert-wholesale-list">
+                  <li>Предоплата: {advert.wholesale_conditions.prepayment}%</li>
+                  <li>
+                    {advert.wholesale_conditions.only_business
+                      ? 'Только для бизнеса'
+                      : 'Доступно и частным лицам'}
+                  </li>
+                </ul>
+              )}
+            </div>
+          )}
+
+          <div className="advert-seller">
+            <h3 className="advert-section-title">Продавец</h3>
+            <p className="advert-seller-name">👤 {advert.user_username}</p>
+            {advert.user_username === currentUser ? (
+              <p className="advert-own">Это ваше объявление</p>
+            ) : (
+              <button
+                onClick={handleContact}
+                disabled={startingChat}
+                className="advert-contact-button"
+              >
+                {startingChat ? 'Открываем чат...' : '💬 Связаться с продавцом'}
+              </button>
             )}
           </div>
-        )}
+        </div>
 
-        <div className="advert-seller">
-          <h3 className="advert-section-title">Продавец</h3>
-          <p className="advert-seller-name">👤 {advert.user_username}</p>
-          {advert.user_username === currentUser ? (
-            <p className="advert-own">Это ваше объявление</p>
-          ) : (
+        {lightbox && advert.image_url && (
+          <div className="advert-lightbox" onClick={() => setLightbox(false)}>
             <button
-              onClick={handleContact}
-              disabled={startingChat}
-              className="advert-contact-button"
-            >
-              {startingChat ? 'Открываем чат...' : '💬 Связаться с продавцом'}
-            </button>
-          )}
-        </div>
+              className="advert-lightbox-close"
+              onClick={() => setLightbox(false)}
+            >✕</button>
+            <img
+              src={advert.image_url}
+              alt={advert.title}
+              className="advert-lightbox-image"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
       </div>
-
-      {lightbox && advert.image_url && (
-        <div className="advert-lightbox" onClick={() => setLightbox(false)}>
-          <button
-            className="advert-lightbox-close"
-            onClick={() => setLightbox(false)}
-          >✕</button>
-          <img
-            src={advert.image_url}
-            alt={advert.title}
-            className="advert-lightbox-image"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 

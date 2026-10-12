@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAdvert, getCategories } from '../services/api';
+import BackButton from './BackButton';
 
 function CreateAdvert() {
   const [form, setForm] = useState({
@@ -59,9 +60,7 @@ function CreateAdvert() {
       formData.append('category', form.category);
       formData.append('is_wholesale', form.is_wholesale);
       formData.append('wholesale_conditions', JSON.stringify(
-        form.is_wholesale
-          ? { prepayment: 0, only_business: false }
-          : { prepayment: 0, only_business: false }
+        { prepayment: 0, only_business: false }
       ));
       if (image) {
         formData.append('image', image);
@@ -73,7 +72,9 @@ function CreateAdvert() {
     } catch (err) {
       if (err.response?.data) {
         const errors = err.response.data;
-        const messages = Object.entries(errors).map(([k, v]) => `${k}: ${v}`).join('\n');
+        const messages = Object.entries(errors)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+          .join('\n');
         setError(messages);
       } else {
         setError('Ошибка при создании. Возможно, вы не авторизованы.');
@@ -85,47 +86,55 @@ function CreateAdvert() {
 
   return (
     <div className="form-container">
-      <h1 style={styles.title}>Подать объявление</h1>
-      <p style={styles.subtitle}>
+      <BackButton text="Отменить" to="/" />
+
+      <h1 className="form-title">➕ Подать объявление</h1>
+      <p className="form-subtitle">
         Объявление появится на сайте после проверки администратором
       </p>
 
-      {error && <div style={styles.error}>{error}</div>}
+      {error && <div className="form-error">{error}</div>}
 
       <form onSubmit={handleSubmit} className="form">
-        <label style={styles.label}>Название *</label>
+        <label className="form-label">Название *</label>
         <input
           name="title"
           placeholder="Например: iPhone 15 Pro, 256 ГБ"
           onChange={handleChange}
           required
-          style={styles.input}
+          className="form-input"
         />
 
-        <label style={styles.label}>Описание *</label>
+        <label className="form-label">Описание *</label>
         <textarea
           name="description"
           placeholder="Состояние, комплектация, детали..."
           onChange={handleChange}
           required
           rows="5"
-          style={styles.textarea}
+          className="form-input"
+          style={{ resize: 'vertical' }}
         />
 
-        <label style={styles.label}>Фото товара</label>
+        <label className="form-label">Фото товара</label>
         <input
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          style={styles.fileInput}
+          className="form-input"
+          style={{ border: '1px dashed #aaa', backgroundColor: '#fafafa' }}
         />
         {imagePreview && (
-          <div style={styles.previewBox}>
-            <img src={imagePreview} alt="Превью" style={styles.preview} />
+          <div style={{ marginTop: '10px', textAlign: 'center' }}>
+            <img
+              src={imagePreview}
+              alt="Превью"
+              style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px' }}
+            />
             <button
               type="button"
               onClick={() => { setImage(null); setImagePreview(null); }}
-              style={styles.removeImage}
+              style={{ display: 'block', margin: '8px auto 0', padding: '6px 14px', backgroundColor: '#fde8e8', color: '#c0392b', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
             >
               Удалить фото
             </button>
@@ -134,36 +143,36 @@ function CreateAdvert() {
 
         <div style={styles.row}>
           <div style={styles.col}>
-            <label style={styles.label}>Цена, ₽ *</label>
+            <label className="form-label">Цена, ₽ *</label>
             <input
               name="price"
               type="number"
               placeholder="89990"
               onChange={handleChange}
               required
-              style={styles.input}
+              className="form-input"
             />
           </div>
           <div style={styles.col}>
-            <label style={styles.label}>Количество</label>
+            <label className="form-label">Количество</label>
             <input
               name="quantity"
               type="number"
               min="1"
               value={form.quantity}
               onChange={handleChange}
-              style={styles.input}
+              className="form-input"
             />
           </div>
         </div>
 
-        <label style={styles.label}>Категория *</label>
+        <label className="form-label">Категория *</label>
         <select
           name="category"
           value={form.category}
           onChange={handleChange}
           required
-          style={styles.input}
+          className="form-input"
         >
           <option value="">— Выберите категорию —</option>
           {categories.map((c) => (
@@ -181,7 +190,7 @@ function CreateAdvert() {
           Оптовое предложение
         </label>
 
-        <button type="submit" disabled={loading} style={styles.button}>
+        <button type="submit" disabled={loading} className="form-button">
           {loading ? 'Отправка...' : 'Отправить на модерацию'}
         </button>
       </form>
@@ -190,22 +199,9 @@ function CreateAdvert() {
 }
 
 const styles = {
-  container: { maxWidth: '600px', margin: '40px auto', padding: '30px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' },
-  title: { margin: '0 0 5px', fontSize: '28px', color: '#1a1a2e' },
-  subtitle: { margin: '0 0 20px', color: '#666', fontSize: '14px' },
-  form: { display: 'flex', flexDirection: 'column' },
-  label: { fontSize: '13px', color: '#666', marginTop: '12px', marginBottom: '4px' },
-  input: { padding: '10px 12px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '15px', fontFamily: 'inherit' },
-  textarea: { padding: '10px 12px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '15px', fontFamily: 'inherit', resize: 'vertical' },
-  fileInput: { padding: '10px', borderRadius: '6px', border: '1px dashed #aaa', fontSize: '14px', backgroundColor: '#fafafa' },
-  previewBox: { marginTop: '10px', textAlign: 'center' },
-  preview: { maxWidth: '100%', maxHeight: '250px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' },
-  removeImage: { marginTop: '8px', padding: '6px 14px', backgroundColor: '#fde8e8', color: '#c0392b', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' },
   row: { display: 'flex', gap: '15px' },
   col: { flex: 1, display: 'flex', flexDirection: 'column' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px', fontSize: '14px', cursor: 'pointer' },
-  button: { marginTop: '25px', backgroundColor: '#1a1a2e', color: '#fff', padding: '14px', borderRadius: '8px', border: 'none', fontSize: '16px', cursor: 'pointer', fontWeight: 'bold' },
-  error: { backgroundColor: '#fde8e8', color: '#c0392b', padding: '12px', borderRadius: '6px', marginBottom: '15px', fontSize: '13px', whiteSpace: 'pre-line' },
 };
 
 export default CreateAdvert;

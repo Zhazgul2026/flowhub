@@ -70,7 +70,7 @@ function ChatPage() {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <Link to="/chats" className="chat-back">←</Link>
+        <Link to="/chats" className="chat-back">← Назад</Link>
         <div className="chat-header-info">
           <div className="chat-title">{chat.advert_title}</div>
           <div className="chat-interlocutor">👤 {interlocutor}</div>

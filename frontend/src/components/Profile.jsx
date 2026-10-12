@@ -20,6 +20,7 @@ function Profile() {
   return (
     <div className="form-container">
       <BackButton text="На главную" to="/" />
+
       <h1 className="form-title">👤 Мой профиль</h1>
       <p className="form-subtitle">Информация о вашем аккаунте</p>
 
@@ -50,7 +51,7 @@ function Profile() {
 
       <div className="profile-row">
         <span className="profile-label">Рейтинг доверия</span>
-        <span className="profile-value">{user.trust_score || 0} ⭐</span>
+        <span className="profile-value">{user.trust_score || 0} ⚡</span>
       </div>
 
       <div style={styles.actions}>
