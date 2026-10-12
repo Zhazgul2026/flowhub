@@ -59,6 +59,8 @@ function HomePage() {
     setSortBy('newest');
   };
 
+  const hasActiveFilters = !!(selectedCategory || search || priceMin || priceMax || onlyWholesale);
+
   const categoryIcons = {
     'Недвижимость': '🏠',
     'Транспорт': '🚗',
@@ -85,7 +87,9 @@ function HomePage() {
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => {
+                setSelectedCategory(selectedCategory === cat.id ? '' : cat.id);
+              }}
               className="category-card"
               style={{
                 borderColor: selectedCategory === cat.id ? '#00F0FF' : '#e0e0e0',
@@ -154,7 +158,18 @@ function HomePage() {
               Только опт
             </label>
 
-            <button onClick={resetFilters} style={styles.resetButton}>Сбросить</button>
+            <button
+              onClick={resetFilters}
+              style={{
+                ...styles.resetButton,
+                backgroundColor: hasActiveFilters ? '#00F0FF' : '#f0f0f0',
+                color: hasActiveFilters ? '#1a1a2e' : '#666',
+                fontWeight: hasActiveFilters ? 'bold' : 'normal',
+                boxShadow: hasActiveFilters ? '0 0 15px rgba(0, 240, 255, 0.5)' : 'none',
+              }}
+            >
+              Сбросить {hasActiveFilters && '✓'}
+            </button>
           </aside>
 
           <main style={styles.main}>
@@ -252,7 +267,7 @@ const styles = {
   priceRow: { display: 'flex', gap: '8px' },
   priceInput: { width: '50%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px', boxSizing: 'border-box' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '8px', margin: '15px 0', fontSize: '14px', cursor: 'pointer' },
-  resetButton: { width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', marginTop: '10px' },
+  resetButton: { width: '100%', padding: '10px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', marginTop: '10px', transition: 'all 0.2s' },
   main: { minWidth: 0 },
   topBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#666', flexWrap: 'wrap', gap: '10px' },
   sortSelect: { padding: '6px 10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px' },
