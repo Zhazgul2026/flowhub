@@ -17,11 +17,16 @@ api.interceptors.request.use((config) => {
 
 export default api;
 
+// Авторизация
 export const register = (data) => api.post('/auth/register/', data);
 export const login = (data) => api.post('/auth/login/', data);
 export const getProfile = () => api.get('/auth/me/');
 
+// Объявления
 export const getAdverts = (params) => api.get('/adverts/', { params });
+export const getAdvert = (id) => api.get(`/adverts/${id}/`);
+export const getCategories = () => api.get('/adverts/categories/');
+
 export const createAdvert = (data) => {
   const isFormData = data instanceof FormData;
   return api.post('/adverts/', data, {
@@ -30,6 +35,7 @@ export const createAdvert = (data) => {
       : { 'Content-Type': 'application/json' },
   });
 };
+
 export const updateAdvert = (id, data) => {
   const isFormData = data instanceof FormData;
   return api.patch(`/adverts/${id}/`, data, {
@@ -40,17 +46,19 @@ export const updateAdvert = (id, data) => {
 };
 
 export const deleteAdvert = (id) => api.delete(`/adverts/${id}/`);
-export const getAdvert = (id) => api.get(`/adverts/${id}/`);
-export const boostAdvert = (id) => api.post(`/adverts/${id}/boost/`);
-export const getCategories = () => api.get('/adverts/categories/');
 
+export const boostAdvert = (id) => api.post(`/adverts/${id}/boost/`);
+
+// Опт
 export const getWholesaleOrders = () => api.get('/wholesale/orders/');
 export const createWholesaleRequest = (data) => api.post('/wholesale/requests/', data);
 export const depositEscrow = (orderId) => api.post(`/wholesale/escrow/deposit/${orderId}/`);
 export const confirmEscrow = (orderId) => api.post(`/wholesale/escrow/confirm/${orderId}/`);
 export const disputeOrder = (orderId) => api.post(`/wholesale/escrow/dispute/${orderId}/`);
 
+// Модерация
 export const checkText = (text) => api.post('/moderation/check-text/', { text });
+
 // Чат
 export const getChats = () => api.get('/chats/');
 export const getChat = (id) => api.get(`/chats/${id}/`);
