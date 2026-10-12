@@ -5,6 +5,7 @@ from django.db import models  # ← добавить, если нет
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Advert, Category
 from .serializers import AdvertSerializer, CategorySerializer
+from rest_framework.exceptions import PermissionDenied
 
 class AdvertViewSet(viewsets.ModelViewSet):
     queryset = Advert.objects.all()
