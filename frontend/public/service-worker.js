@@ -1,5 +1,5 @@
 /* Service Worker для ЗипТап */
-const CACHE_NAME = 'ZipTap-v2';
+const CACHE_NAME = 'ziptap-v3';
 const URLS_TO_CACHE = [
   '/',
   '/manifest.json',
