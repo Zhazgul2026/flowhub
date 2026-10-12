@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://192.168.3.8:8000/api';
+const API_URL = 'https://ziptap-api.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
