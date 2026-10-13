@@ -11,12 +11,12 @@ class Category(models.Model):
 
 class Advert(models.Model):
     STATUS_CHOICES = (
-    ('moderation', 'На модерации'),
-    ('active', 'Активно'),
-    ('blocked', 'Заблокировано'),
-    ('sold', 'Продано'),
-    ('expired', 'Истекло'),
-)
+        ('moderation', 'На модерации'),
+        ('active', 'Активно'),
+        ('blocked', 'Заблокировано'),
+        ('sold', 'Продано'),
+        ('expired', 'Истекло'),
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='adverts')
     title = models.CharField(max_length=200)
     description = models.TextField()
