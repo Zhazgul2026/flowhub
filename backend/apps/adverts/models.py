@@ -11,11 +11,12 @@ class Category(models.Model):
 
 class Advert(models.Model):
     STATUS_CHOICES = (
-        ('moderation', 'На модерации'),
-        ('active', 'Активно'),
-        ('blocked', 'Заблокировано'),
-        ('sold', 'Продано'),
-    )
+    ('moderation', 'На модерации'),
+    ('active', 'Активно'),
+    ('blocked', 'Заблокировано'),
+    ('sold', 'Продано'),
+    ('expired', 'Истекло'),
+)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='adverts')
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -28,6 +29,7 @@ class Advert(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='moderation')
     views_count = models.IntegerField(default=0)
     auto_boost_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

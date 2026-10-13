@@ -28,7 +28,10 @@ class AdvertViewSet(viewsets.ModelViewSet):
         return Advert.objects.filter(status='active')
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    from django.utils import timezone
+    from datetime import timedelta
+    expires_at = timezone.now() + timedelta(days=30)
+    serializer.save(user=self.request.user, expires_at=expires_at)
 
     def perform_update(self, serializer):
         # При редактировании — снова на модерацию
