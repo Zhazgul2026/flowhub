@@ -79,6 +79,28 @@ class AdvertViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Объявление продлено на 30 дней'})
 
 
+
+            @action(detail=False, methods=['get'])
+    def my(self, request):
+        """Мои объявления — все статусы."""
+        if not request.user.is_authenticated:
+            return Response({'error': 'Требуется авторизация'}, status=401)
+        adverts = Advert.objects.filter(user=request.user).order_by('-created_at')
+        serializer = self.get_serializer(adverts, many=True)
+        return Response(serializer.data)
+
+
+
+            @action(detail=False, methods=['get'])
+    def my(self, request):
+        """Мои объявления — все статусы."""
+        if not request.user.is_authenticated:
+            return Response({'error': 'Требуется авторизация'}, status=401)
+        adverts = Advert.objects.filter(user=request.user).order_by('-created_at')
+        serializer = self.get_serializer(adverts, many=True)
+        return Response(serializer.data)
+
+
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer

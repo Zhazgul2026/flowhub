@@ -38,6 +38,7 @@ export const getProfile = () => api.get('/auth/me/');
 
 // Объявления
 export const getAdverts = (params) => api.get('/adverts/', { params });
+export const getMyAdverts = () => api.get('/adverts/my/');
 export const getAdvert = (id) => api.get(`/adverts/${id}/`);
 export const getCategories = () => api.get('/adverts/categories/');
 

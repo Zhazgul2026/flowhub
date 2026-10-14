@@ -55,8 +55,9 @@ function Profile() {
       </div>
 
       <div style={styles.actions}>
-        <Link to="/create" style={styles.primaryButton}>➕ Подать объявление</Link>
-        <Link to="/chats" style={styles.secondaryButton}>💬 Мои чаты</Link>
+  <Link to="/create" style={styles.primaryButton}>➕ Подать объявление</Link>
+  <Link to="/my-adverts" style={styles.secondaryButton}>📋 Мои объявления</Link>
+  <Link to="/chats" style={styles.secondaryButton}>💬 Мои чаты</Link>
         {user.user_type === 'registered' && (
           <Link to="/verify" style={styles.verifyButton}>✅ Пройти верификацию</Link>
         )}
