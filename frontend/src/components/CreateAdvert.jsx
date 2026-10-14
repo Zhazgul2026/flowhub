@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { createAdvert, getCategories } from '../services/api';
 import BackButton from './BackButton';
 
@@ -69,11 +69,11 @@ function CreateAdvert() {
       await createAdvert(formData);
       alert('Объявление создано! Оно отправлено на модерацию.');
       navigate('/');
-       } catch (err) {
-  if (err.response?.status === 403) {
-    const errorMsg = err.response.data?.detail || 'Лимит бесплатных объявлений исчерпан. Купите пакет для публикации дополнительных объявлений.';
-    setError(errorMsg);
-  } else if (err.response?.data) {
+    } catch (err) {
+      if (err.response?.status === 403) {
+        const errorMsg = err.response.data?.detail || 'Лимит бесплатных объявлений исчерпан.';
+        setError(errorMsg);
+      } else if (err.response?.data) {
         const errors = err.response.data;
         const messages = Object.entries(errors)
           .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
@@ -87,6 +87,8 @@ function CreateAdvert() {
     }
   };
 
+  const isLimitError = error.toLowerCase().includes('лимит');
+
   return (
     <div className="form-container">
       <BackButton text="Отменить" to="/" />
@@ -96,7 +98,18 @@ function CreateAdvert() {
         Объявление появится на сайте после проверки администратором
       </p>
 
-      {error && <div className="form-error">{error}</div>}
+      {error && (
+        <div className="form-error">
+          {error}
+          {isLimitError && (
+            <div style={{ marginTop: '10px' }}>
+              <Link to="/pricing" style={{ color: '#00F0FF', fontWeight: 'bold', textDecoration: 'underline' }}>
+                👉 Посмотреть тарифы
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="form">
         <label className="form-label">Название *</label>
