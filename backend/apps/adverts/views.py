@@ -16,6 +16,14 @@ class AdvertViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'is_wholesale')
 
+    # Лимиты по типу аккаунта (в месяц)
+    MONTHLY_LIMITS = {
+        'registered': 1,
+        'verified_private': 2,
+        'entrepreneur': 5,
+        'legal_entity': 5,
+    }
+
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy', 'renew']:
             return (permissions.IsAuthenticated(),)
@@ -30,8 +38,27 @@ class AdvertViewSet(viewsets.ModelViewSet):
         return Advert.objects.filter(status='active')
 
     def perform_create(self, serializer):
+        user = self.request.user
+
+        # Лимит в месяц
+        limit = self.MONTHLY_LIMITS.get(user.user_type, 1)
+        first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+        # Считаем объявления пользователя за месяц (включая удалённые/неактивные)
+        count_this_month = Advert.objects.filter(
+            user=user,
+            created_at__gte=first_day_of_month,
+        ).count()
+
+        if count_this_month >= limit:
+            raise PermissionDenied(
+                f'Лимит бесплатных объявлений исчерпан ({limit} в месяц). '
+                f'Купите пакет для публикации дополнительных объявлений.'
+            )
+
+        # Устанавливаем expires_at — 30 дней
         expires_at = timezone.now() + timedelta(days=30)
-        serializer.save(user=self.request.user, expires_at=expires_at)
+        serializer.save(user=user, expires_at=expires_at)
 
     def perform_update(self, serializer):
         serializer.save(status='moderation')

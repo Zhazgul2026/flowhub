@@ -69,8 +69,11 @@ function CreateAdvert() {
       await createAdvert(formData);
       alert('Объявление создано! Оно отправлено на модерацию.');
       navigate('/');
-    } catch (err) {
-      if (err.response?.data) {
+        } catch (err) {
+      if (err.response?.status === 403) {
+        const errorMsg = err.response.data?.detail || 'Лимит бесплатных объявлений исчерпан.';
+        setError(errorMsg + '\n\nКупите пакет для публикации дополнительных объявлений.');
+      } else if (err.response?.data) {
         const errors = err.response.data;
         const messages = Object.entries(errors)
           .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
