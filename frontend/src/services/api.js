@@ -9,11 +9,25 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
-  if (token) {
+  if (token && token.length > 50) {  // валидный JWT длиннее 50 символов
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Если 401 — токен невалидный, чистим
+    if (error.response && error.response.status === 401) {
+      console.warn('Токен невалидный, очищаем...');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('username');
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
 
