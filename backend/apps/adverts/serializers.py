@@ -12,11 +12,11 @@ class AdvertSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
     class Meta:
-    model = Advert
-    fields = ('id', 'user', 'user_username', 'title', 'description', 'price', 'quantity',
-              'category', 'category_name', 'image', 'image_url', 'is_wholesale',
-              'wholesale_conditions', 'status', 'views_count', 'created_at',
-              'expires_at')
+        model = Advert
+        fields = ('id', 'user', 'user_username', 'title', 'description', 'price', 'quantity',
+                  'category', 'category_name', 'image', 'image_url', 'is_wholesale',
+                  'wholesale_conditions', 'status', 'views_count', 'created_at')
+        read_only_fields = ('user', 'status', 'views_count')
 
     def get_image_url(self, obj):
         if obj.image:
