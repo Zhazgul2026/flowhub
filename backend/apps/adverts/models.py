@@ -26,6 +26,7 @@ class Advert(models.Model):
     image = models.ImageField(upload_to='adverts/', null=True, blank=True)
     is_wholesale = models.BooleanField(default=False)
     wholesale_conditions = models.JSONField(default=dict)
+    category_fields = models.JSONField(default=dict, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='moderation')
     views_count = models.IntegerField(default=0)
     auto_boost_at = models.DateTimeField(null=True, blank=True)
