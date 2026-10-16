@@ -99,12 +99,23 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:3000'
 ).split(',')
+
+# Всегда разрешаем локальную разработку (безопасно — только для localhost)
+for origin in ['http://localhost:3000', 'http://127.0.0.1:3000']:
+    if origin not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(origin)
+
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = os.getenv(
     'CSRF_TRUSTED_ORIGINS',
     'http://localhost:3000'
 ).split(',')
+
+# То же для CSRF
+for origin in ['http://localhost:3000', 'http://127.0.0.1:3000']:
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

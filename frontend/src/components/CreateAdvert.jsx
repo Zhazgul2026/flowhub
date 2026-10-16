@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createAdvert, getCategories } from '../services/api';
+import { getFieldsForCategory } from '../utils/categoryFields';
 import BackButton from './BackButton';
 
 function CreateAdvert() {
@@ -12,6 +13,7 @@ function CreateAdvert() {
     category: '',
     is_wholesale: false,
   });
+  const [categoryFields, setCategoryFields] = useState({}); // ← новое
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -33,6 +35,18 @@ function CreateAdvert() {
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setForm({ ...form, [e.target.name]: value });
+  };
+
+  // Обработка динамических полей категории
+  const handleCategoryFieldChange = (name, value) => {
+    setCategoryFields((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // При смене категории — очищаем поля старой категории
+  const handleCategoryChange = (e) => {
+    const newCategory = e.target.value;
+    setForm({ ...form, category: newCategory });
+    setCategoryFields({}); // сбрасываем
   };
 
   const handleImageChange = (e) => {
@@ -62,6 +76,8 @@ function CreateAdvert() {
       formData.append('wholesale_conditions', JSON.stringify(
         { prepayment: 0, only_business: false }
       ));
+      // ← новое: динамические поля категории
+      formData.append('category_fields', JSON.stringify(categoryFields));
       if (image) {
         formData.append('image', image);
       }
@@ -88,6 +104,7 @@ function CreateAdvert() {
   };
 
   const isLimitError = error.toLowerCase().includes('лимит');
+  const dynamicFields = getFieldsForCategory(form.category);
 
   return (
     <div className="form-container">
@@ -186,7 +203,7 @@ function CreateAdvert() {
         <select
           name="category"
           value={form.category}
-          onChange={handleChange}
+          onChange={handleCategoryChange}
           required
           className="form-input"
         >
@@ -195,6 +212,38 @@ function CreateAdvert() {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
+
+        {/* ← Динамические поля под выбранную категорию */}
+        {dynamicFields.length > 0 && (
+          <div style={styles.dynamicBlock}>
+            <h3 style={styles.dynamicTitle}>Характеристики</h3>
+            {dynamicFields.map((field) => (
+              <div key={field.name} style={{ marginBottom: '12px' }}>
+                <label className="form-label">{field.label}</label>
+                {field.type === 'select' ? (
+                  <select
+                    className="form-input"
+                    value={categoryFields[field.name] || ''}
+                    onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
+                  >
+                    <option value="">— Выберите —</option>
+                    {field.options.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type={field.type === 'number' ? 'number' : 'text'}
+                    className="form-input"
+                    placeholder={field.placeholder || ''}
+                    value={categoryFields[field.name] || ''}
+                    onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         <label style={styles.checkboxLabel}>
           <input
@@ -218,6 +267,18 @@ const styles = {
   row: { display: 'flex', gap: '15px' },
   col: { flex: 1, display: 'flex', flexDirection: 'column' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px', fontSize: '14px', cursor: 'pointer' },
+  dynamicBlock: {
+    marginTop: '20px',
+    padding: '16px',
+    borderRadius: '10px',
+    backgroundColor: '#f5f7fa',
+    border: '1px solid #e1e5ea',
+  },
+  dynamicTitle: {
+    margin: '0 0 14px 0',
+    fontSize: '16px',
+    fontWeight: 'bold',
+  },
 };
 
 export default CreateAdvert;
