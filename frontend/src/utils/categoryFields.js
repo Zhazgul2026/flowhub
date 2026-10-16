@@ -1,6 +1,5 @@
 // Словарь дополнительных полей по категориям.
-// Ключ — id категории из API (/api/adverts/categories/).
-// type: 'text' | 'number' | 'select'
+// Типы полей: 'text' | 'number' | 'select' | 'dependent'
 
 export const CATEGORY_FIELDS = {
   // 1. Недвижимость
@@ -18,9 +17,15 @@ export const CATEGORY_FIELDS = {
 
   // 2. Транспорт
   2: [
-    { name: 'vehicle_type', label: 'Тип транспорта', type: 'select', options: ['Автомобиль', 'Мотоцикл', 'Грузовик', 'Автобус', 'Спецтехника', 'Водный', 'Запчасти'] },
-    { name: 'brand', label: 'Марка', type: 'text', placeholder: 'Toyota' },
-    { name: 'model', label: 'Модель', type: 'text', placeholder: 'Camry' },
+    { name: 'vehicle_type', label: 'Тип транспорта', type: 'select', options: [
+      { value: 'car', label: 'Автомобиль' },
+      { value: 'moto', label: 'Мотоцикл' },
+      { value: 'truck', label: 'Грузовик' },
+      { value: 'special', label: 'Спецтехника' },
+      { value: 'water', label: 'Водный транспорт' },
+    ]},
+    { name: 'brand', label: 'Марка', type: 'dependent', catalogKey: 'VEHICLE_BRANDS', dependsOn: 'vehicle_type' },
+    { name: 'model', label: 'Модель', type: 'dependent', catalogKey: 'VEHICLE_MODELS', dependsOn: 'brand' },
     { name: 'year', label: 'Год выпуска', type: 'number', placeholder: '2020' },
     { name: 'mileage', label: 'Пробег, км', type: 'number', placeholder: '45000' },
     { name: 'transmission', label: 'КПП', type: 'select', options: ['Автомат', 'Механика', 'Робот', 'Вариатор'] },
@@ -32,8 +37,17 @@ export const CATEGORY_FIELDS = {
 
   // 3. Электроника
   3: [
-    { name: 'product_type', label: 'Тип', type: 'select', options: ['Смартфон', 'Ноутбук', 'Планшет', 'Телевизор', 'Наушники', 'Бытовая техника', 'Игровая приставка', 'Другое'] },
-    { name: 'brand', label: 'Бренд', type: 'text', placeholder: 'Apple' },
+    { name: 'product_type', label: 'Тип', type: 'select', options: [
+      { value: 'smartphone', label: 'Смартфон' },
+      { value: 'laptop', label: 'Ноутбук' },
+      { value: 'tablet', label: 'Планшет' },
+      { value: 'tv', label: 'Телевизор' },
+      { value: 'headphones', label: 'Наушники' },
+      { value: 'console', label: 'Игровая приставка' },
+      { value: 'appliances', label: 'Бытовая техника' },
+      { value: 'other', label: 'Другое' },
+    ]},
+    { name: 'brand', label: 'Бренд', type: 'dependent', catalogKey: 'ELECTRONICS_BRANDS', dependsOn: 'product_type' },
     { name: 'model', label: 'Модель', type: 'text', placeholder: 'iPhone 15 Pro' },
     { name: 'condition', label: 'Состояние', type: 'select', options: ['Новое', 'Отличное', 'Хорошее', 'Б/у'] },
     { name: 'warranty', label: 'Гарантия', type: 'select', options: ['Есть', 'Нет'] },
@@ -43,7 +57,7 @@ export const CATEGORY_FIELDS = {
   // 4. Одежда и обувь
   4: [
     { name: 'product_type', label: 'Тип', type: 'select', options: ['Верхняя одежда', 'Платья', 'Футболки', 'Джинсы', 'Обувь', 'Аксессуары', 'Другое'] },
-    { name: 'brand', label: 'Бренд', type: 'text', placeholder: 'Nike' },
+    { name: 'brand', label: 'Бренд', type: 'dependent', catalogKey: 'CLOTHING_BRANDS' },
     { name: 'size', label: 'Размер', type: 'text', placeholder: 'M / 42' },
     { name: 'color', label: 'Цвет', type: 'text', placeholder: 'Чёрный' },
     { name: 'gender', label: 'Для кого', type: 'select', options: ['Мужское', 'Женское', 'Унисекс', 'Детское'] },
@@ -53,7 +67,7 @@ export const CATEGORY_FIELDS = {
   // 5. Дом и сад
   5: [
     { name: 'product_type', label: 'Тип товара', type: 'select', options: ['Мебель', 'Инструмент', 'Растения', 'Декор', 'Посуда', 'Текстиль', 'Другое'] },
-    { name: 'brand', label: 'Бренд', type: 'text' },
+    { name: 'brand', label: 'Бренд', type: 'dependent', catalogKey: 'HOME_BRANDS' },
     { name: 'material', label: 'Материал', type: 'text', placeholder: 'Дерево / Металл' },
     { name: 'condition', label: 'Состояние', type: 'select', options: ['Новое', 'Отличное', 'Хорошее', 'Б/у'] },
   ],
@@ -80,7 +94,7 @@ export const CATEGORY_FIELDS = {
   // 8. Хобби и отдых
   8: [
     { name: 'product_type', label: 'Тип', type: 'select', options: ['Спорт', 'Музыка', 'Книги', 'Туризм', 'Коллекционное', 'Настольные игры', 'Другое'] },
-    { name: 'brand', label: 'Бренд', type: 'text' },
+    { name: 'brand', label: 'Бренд', type: 'dependent', catalogKey: 'HOBBY_BRANDS' },
     { name: 'condition', label: 'Состояние', type: 'select', options: ['Новое', 'Отличное', 'Хорошее', 'Б/у'] },
   ],
 
@@ -94,7 +108,14 @@ export const CATEGORY_FIELDS = {
   ],
 };
 
-// Удобный хелпер: получить поля для категории
+// Хелпер: получить поля для категории
 export const getFieldsForCategory = (categoryId) => {
   return CATEGORY_FIELDS[Number(categoryId)] || [];
+};
+
+// Хелпер: нормализовать options (могут быть строками или объектами {value, label})
+export const normalizeOptions = (options = []) => {
+  return options.map((opt) =>
+    typeof opt === 'string' ? { value: opt, label: opt } : opt
+  );
 };

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createAdvert, getCategories } from '../services/api';
-import { getFieldsForCategory } from '../utils/categoryFields';
+import { getFieldsForCategory, normalizeOptions } from '../utils/categoryFields';
+import { getCatalogList } from '../utils/catalogs';
 import BackButton from './BackButton';
 
 function CreateAdvert() {
@@ -13,7 +14,7 @@ function CreateAdvert() {
     category: '',
     is_wholesale: false,
   });
-  const [categoryFields, setCategoryFields] = useState({}); // ← новое
+  const [categoryFields, setCategoryFields] = useState({});
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -37,16 +38,37 @@ function CreateAdvert() {
     setForm({ ...form, [e.target.name]: value });
   };
 
-  // Обработка динамических полей категории
   const handleCategoryFieldChange = (name, value) => {
-    setCategoryFields((prev) => ({ ...prev, [name]: value }));
+    setCategoryFields((prev) => {
+      const updated = { ...prev, [name]: value };
+
+      // Если поменялся vehicle_type — сбрасываем brand и model
+      if (name === 'vehicle_type') {
+        delete updated.brand;
+        delete updated.model;
+      }
+      // Если поменялся product_type (электроника) — сбрасываем brand
+      if (name === 'product_type') {
+        delete updated.brand;
+      }
+      // Если поменялся brand — сбрасываем model
+      if (name === 'brand') {
+        delete updated.model;
+      }
+
+      return updated;
+    });
   };
 
-  // При смене категории — очищаем поля старой категории
+  // Ручной ввод, если в каталоге нет (через "Другое")
+  const handleManualChange = (name, value) => {
+    setCategoryFields((prev) => ({ ...prev, [`${name}_manual`]: value }));
+  };
+
   const handleCategoryChange = (e) => {
     const newCategory = e.target.value;
     setForm({ ...form, category: newCategory });
-    setCategoryFields({}); // сбрасываем
+    setCategoryFields({});
   };
 
   const handleImageChange = (e) => {
@@ -76,11 +98,24 @@ function CreateAdvert() {
       formData.append('wholesale_conditions', JSON.stringify(
         { prepayment: 0, only_business: false }
       ));
-      // ← новое: динамические поля категории
-      formData.append('category_fields', JSON.stringify(categoryFields));
-      if (image) {
-        formData.append('image', image);
-      }
+
+      // Фильтруем category_fields: убираем _manual, если основной выбран
+      const cleanFields = { ...categoryFields };
+      Object.keys(cleanFields).forEach((key) => {
+        if (key.endsWith('_manual')) {
+          const base = key.replace('_manual', '');
+          if (cleanFields[base] && cleanFields[base] !== 'Другое') {
+            delete cleanFields[key];
+          } else {
+            // Если основное — "Другое" или пусто, используем ручной ввод
+            cleanFields[base] = cleanFields[key];
+            delete cleanFields[key];
+          }
+        }
+      });
+
+      formData.append('category_fields', JSON.stringify(cleanFields));
+      if (image) formData.append('image', image);
 
       await createAdvert(formData);
       alert('Объявление создано! Оно отправлено на модерацию.');
@@ -105,6 +140,82 @@ function CreateAdvert() {
 
   const isLimitError = error.toLowerCase().includes('лимит');
   const dynamicFields = getFieldsForCategory(form.category);
+
+  // Отрисовка одного поля
+  const renderField = (field) => {
+    const value = categoryFields[field.name] || '';
+
+    // === SELECT ===
+    if (field.type === 'select') {
+      const options = normalizeOptions(field.options);
+      return (
+        <select
+          className="form-input"
+          value={value}
+          onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
+        >
+          <option value="">— Выберите —</option>
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      );
+    }
+
+    // === DEPENDENT (зависимый селект) ===
+    if (field.type === 'dependent') {
+      const filterValue = field.dependsOn ? categoryFields[field.dependsOn] : null;
+      const list = getCatalogList(field.catalogKey, filterValue);
+
+      // Если зависит от чего-то, а родитель ещё не выбран — блокируем
+      if (field.dependsOn && !filterValue) {
+        return (
+          <select className="form-input" disabled>
+            <option value="">— Сначала выберите предыдущее поле —</option>
+          </select>
+        );
+      }
+
+      const isOther = value === '__other__';
+      return (
+        <>
+          <select
+            className="form-input"
+            value={isOther ? '__other__' : value}
+            onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
+          >
+            <option value="">— Выберите —</option>
+            {list.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+            <option value="__other__">Другое (ввести вручную)</option>
+          </select>
+
+          {isOther && (
+            <input
+              type="text"
+              className="form-input"
+              style={{ marginTop: '8px' }}
+              placeholder="Введите значение"
+              value={categoryFields[`${field.name}_manual`] || ''}
+              onChange={(e) => handleManualChange(field.name, e.target.value)}
+            />
+          )}
+        </>
+      );
+    }
+
+    // === TEXT / NUMBER ===
+    return (
+      <input
+        type={field.type === 'number' ? 'number' : 'text'}
+        className="form-input"
+        placeholder={field.placeholder || ''}
+        value={value}
+        onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
+      />
+    );
+  };
 
   return (
     <div className="form-container">
@@ -213,33 +324,13 @@ function CreateAdvert() {
           ))}
         </select>
 
-        {/* ← Динамические поля под выбранную категорию */}
         {dynamicFields.length > 0 && (
           <div style={styles.dynamicBlock}>
             <h3 style={styles.dynamicTitle}>Характеристики</h3>
             {dynamicFields.map((field) => (
               <div key={field.name} style={{ marginBottom: '12px' }}>
                 <label className="form-label">{field.label}</label>
-                {field.type === 'select' ? (
-                  <select
-                    className="form-input"
-                    value={categoryFields[field.name] || ''}
-                    onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
-                  >
-                    <option value="">— Выберите —</option>
-                    {field.options.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={field.type === 'number' ? 'number' : 'text'}
-                    className="form-input"
-                    placeholder={field.placeholder || ''}
-                    value={categoryFields[field.name] || ''}
-                    onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
-                  />
-                )}
+                {renderField(field)}
               </div>
             ))}
           </div>
