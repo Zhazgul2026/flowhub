@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getAdvert, createChat, deleteAdvert } from '../services/api';
+import { getFieldsForCategory } from '../utils/categoryFields';
 import BackButton from './BackButton';
 
 function AdvertDetail() {
@@ -66,6 +67,37 @@ function AdvertDetail() {
   const isOwner = advert.user_username === currentUser;
   const formatPrice = (price) => new Intl.NumberFormat('ru-RU').format(price);
 
+  // === Характеристики ===
+  const fieldsSchema = getFieldsForCategory(advert.category);
+  const categoryFields = advert.category_fields || {};
+
+  // Формируем пары {label, value} для отображения
+  const characteristicsList = fieldsSchema
+    .map((field) => {
+      const raw = categoryFields[field.name];
+      if (raw === undefined || raw === null || raw === '') return null;
+
+      let displayValue = raw;
+
+      // Если значение — служебное "__other__" — показываем ручной ввод
+      if (raw === '__other__') {
+        const manual = categoryFields[`${field.name}_manual`];
+        if (!manual) return null;
+        displayValue = manual;
+      }
+
+      // Для select с {value, label} — показываем label
+      if (field.type === 'select' && Array.isArray(field.options)) {
+        const opt = field.options.find(
+          (o) => (typeof o === 'object' ? o.value : o) === raw
+        );
+        if (opt && typeof opt === 'object') displayValue = opt.label;
+      }
+
+      return { label: field.label, value: displayValue };
+    })
+    .filter(Boolean);
+
   return (
     <>
       <div style={{ maxWidth: '1000px', margin: '20px auto 0', padding: '0 20px' }}>
@@ -99,6 +131,22 @@ function AdvertDetail() {
             <h3 className="advert-section-title">Описание</h3>
             <p className="advert-description">{advert.description}</p>
           </div>
+
+          {/* === Блок характеристик === */}
+          {characteristicsList.length > 0 && (
+            <div className="advert-block">
+              <h3 className="advert-section-title">Характеристики</h3>
+              <div style={styles.specs}>
+                {characteristicsList.map(({ label, value }) => (
+                  <div key={label} style={styles.specRow}>
+                    <span style={styles.specLabel}>{label}</span>
+                    <span style={styles.specDots} />
+                    <span style={styles.specValue}>{String(value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {advert.is_wholesale && (
             <div className="advert-wholesale-block">
@@ -188,6 +236,34 @@ const styles = {
     fontSize: '15px',
     fontWeight: 'bold',
     fontFamily: 'inherit',
+  },
+  // Стили таблицы характеристик
+  specs: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    marginTop: '8px',
+  },
+  specRow: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '8px',
+    fontSize: '15px',
+  },
+  specLabel: {
+    color: '#666',
+    whiteSpace: 'nowrap',
+  },
+  specDots: {
+    flex: 1,
+    borderBottom: '1px dotted #ccc',
+    marginBottom: '3px',
+    minWidth: '20px',
+  },
+  specValue: {
+    fontWeight: '500',
+    textAlign: 'right',
+    color: '#1a1a2e',
   },
 };
 
