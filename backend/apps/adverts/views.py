@@ -8,6 +8,7 @@ from datetime import timedelta
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Advert, Category
 from .serializers import AdvertSerializer, CategorySerializer
+from .filters import AdvertFilter
 
 
 class AdvertViewSet(viewsets.ModelViewSet):
@@ -19,8 +20,8 @@ class AdvertViewSet(viewsets.ModelViewSet):
     MONTHLY_LIMITS = {
         'registered': 1,
         'verified_private': 2,
-        'entrepreneur': 5,
-        'legal_entity': 5,
+        'entrepreneur': 2,
+        'legal_entity': 2,
     }
 
     def get_permissions(self):
@@ -31,10 +32,16 @@ class AdvertViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            return Advert.objects.filter(
+            queryset = Advert.objects.filter(
                 models.Q(status='active') | models.Q(user=user)
             ).distinct()
-        return Advert.objects.filter(status='active')
+        else:
+            queryset = Advert.objects.filter(status='active')
+
+        filterset = AdvertFilter(self.request.query_params, queryset=queryset)
+        if filterset.is_valid():
+            return filterset.qs
+        return queryset
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -72,7 +79,6 @@ class AdvertViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def my(self, request):
-        """Мои объявления — все статусы."""
         if not request.user.is_authenticated:
             return Response({'error': 'Требуется авторизация'}, status=401)
         adverts = Advert.objects.filter(user=request.user).order_by('-created_at')
