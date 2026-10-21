@@ -26,10 +26,10 @@ class Chat(models.Model):
         return f"Чат #{self.id}: {self.buyer.username} → {self.seller.username}"
 
 class Message(models.Model):
-    """Сообщение в чате."""
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    text = models.TextField()
+    text = models.TextField(blank=True) # Разрешаем пустой текст, если есть фото
+    image = models.ImageField(upload_to='chat_images/', null=True, blank=True) # <-- ДОБАВИЛИ ФОТО
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

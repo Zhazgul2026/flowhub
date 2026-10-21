@@ -5,11 +5,17 @@ from apps.users.models import User
 
 class MessageSerializer(serializers.ModelSerializer):
     sender_username = serializers.ReadOnlyField(source='sender.username')
+    image_url = serializers.SerializerMethodField() # <-- ДОБАВИЛИ
 
     class Meta:
         model = Message
-        fields = ('id', 'chat', 'sender', 'sender_username', 'text', 'is_read', 'created_at')
-        read_only_fields = ('sender', 'is_read')
+        fields = ('id', 'sender', 'sender_username', 'text', 'image', 'image_url', 'created_at')
+        read_only_fields = ('sender', 'created_at')
+
+    def get_image_url(self, obj): # <-- ДОБАВИЛИ
+        if obj.image:
+            return obj.image.url
+        return None
 
 
 class ChatSerializer(serializers.ModelSerializer):

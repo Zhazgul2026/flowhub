@@ -78,7 +78,14 @@ export const checkText = (text) => api.post('/moderation/check-text/', { text })
 export const getChats = () => api.get('/chats/');
 export const getChat = (id) => api.get(`/chats/${id}/`);
 export const createChat = (advertId) => api.post('/chats/', { advert: advertId });
-export const sendMessage = (chatId, text) => api.post(`/chats/${chatId}/send/`, { text });
+export const sendMessage = (chatId, data) => {
+  const isFormData = data instanceof FormData;
+  return api.post(`/chats/${chatId}/send/`, data, {
+    headers: isFormData
+      ? { 'Content-Type': 'multipart/form-data' }
+      : { 'Content-Type': 'application/json' },
+  });
+};
 export const getUnreadCount = () => api.get('/chats/unread/');
 
 // Избранное (ВОТ ТУТ ИСПРАВЛЕНЫ ПУТИ!)

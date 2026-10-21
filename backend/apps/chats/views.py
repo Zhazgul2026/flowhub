@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-
+from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Chat, Message
 from .serializers import ChatSerializer, MessageSerializer
 from apps.adverts.models import Advert
@@ -86,6 +86,24 @@ class SendMessageView(APIView):
         chat.save()  # обновляет updated_at
 
         return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
+
+        @action(detail=True, methods=['post'], parser_classes=[MultiPartParser, FormParser])
+    def send(self, request, pk=None):
+        chat = self.get_object()
+        text = request.data.get('text', '')
+        image = request.FILES.get('image')
+        
+        if not text and not image:
+            return Response({'error': 'Сообщение не может быть пустым'}, status=400)
+
+        message = Message.objects.create(
+            chat=chat,
+            sender=request.user,
+            text=text,
+            image=image
+        )
+        serializer = MessageSerializer(message)
+        return Response(serializer.data)
 
 
 class UnreadCountView(APIView):
