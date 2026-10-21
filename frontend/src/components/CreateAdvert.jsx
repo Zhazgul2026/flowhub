@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { createAdvert, getCategories } from '../services/api';
 import { getFieldsForCategory, normalizeOptions } from '../utils/categoryFields';
 import { getCatalogList } from '../utils/catalogs';
-import { CITIES } from '../utils/cities'; // <-- ДОБАВЛЕН ИМПОРТ ГОРОДОВ
+import { CITIES } from '../utils/cities';
+import { generateSmartTitle, cleanTitle } from '../utils/advertHelpers';
 import BackButton from './BackButton';
 
 function CreateAdvert() {
@@ -13,7 +14,7 @@ function CreateAdvert() {
     price: '',
     quantity: 1,
     category: '',
-    city: 'Москва', // <-- ДОБАВЛЕН ГОРОД
+    city: 'Москва',
     is_wholesale: false,
   });
   const [categoryFields, setCategoryFields] = useState({});
@@ -85,12 +86,21 @@ function CreateAdvert() {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('title', form.title);
+      
+      // --- УМНЫЙ ЗАГОЛОВОК ---
+      let finalTitle = cleanTitle(form.title);
+      if (!finalTitle) {
+        finalTitle = generateSmartTitle(form.category, categoryFields);
+      }
+      if (!finalTitle) finalTitle = 'Объявление без названия';
+      formData.append('title', finalTitle);
+      // ------------------------
+
       formData.append('description', form.description);
       formData.append('price', form.price);
       formData.append('quantity', form.quantity);
       formData.append('category', form.category);
-      formData.append('city', form.city); // <-- ДОБАВЛЕН ГОРОД В ОТПРАВКУ
+      formData.append('city', form.city);
       formData.append('is_wholesale', form.is_wholesale);
       formData.append('wholesale_conditions', JSON.stringify(
         { prepayment: 0, only_business: false }
@@ -222,8 +232,11 @@ function CreateAdvert() {
       )}
 
       <form onSubmit={handleSubmit} className="form">
-        <label className="form-label">Название *</label>
-        <input name="title" placeholder="Например: iPhone 15 Pro, 256 ГБ" onChange={handleChange} required className="form-input" />
+        <label className="form-label">Название (необязательно)</label>
+        <input name="title" placeholder="Например: iPhone 15 Pro" onChange={handleChange} className="form-input" />
+        <p style={{ fontSize: '12px', color: '#888', marginTop: '-10px', marginBottom: '15px' }}>
+          * Оставьте пустым — мы соберём название автоматически из характеристик
+        </p>
 
         <label className="form-label">Описание *</label>
         <textarea name="description" placeholder="Состояние, комплектация, детали..." onChange={handleChange} required rows="5" className="form-input" style={{ resize: 'vertical' }} />
@@ -250,7 +263,6 @@ function CreateAdvert() {
           </div>
         </div>
 
-        {/* --- БЛОК ГОРОДА --- */}
         <label className="form-label">Город *</label>
         <select name="city" value={form.city} onChange={handleChange} required className="form-input">
           {CITIES.filter(c => c !== 'Вся Россия').map(c => <option key={c} value={c}>{c}</option>)}

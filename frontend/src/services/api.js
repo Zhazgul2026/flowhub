@@ -80,3 +80,4 @@ export const getChat = (id) => api.get(`/chats/${id}/`);
 export const createChat = (advertId) => api.post('/chats/', { advert: advertId });
 export const sendMessage = (chatId, text) => api.post(`/chats/${chatId}/send/`, { text });
 export const getUnreadCount = () => api.get('/chats/unread/');
+export const renewAdvert = (id) => api.post(`/adverts/${id}/renew/`);

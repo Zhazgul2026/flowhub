@@ -66,8 +66,7 @@ function AdvertDetail() {
 
   const isOwner = advert.user_username === currentUser;
   const formatPrice = (price) => new Intl.NumberFormat('ru-RU').format(price);
-
-  // === Характеристики ===
+  
   const fieldsSchema = getFieldsForCategory(advert.category);
   const categoryFields = advert.category_fields || {};
 
@@ -78,15 +77,12 @@ function AdvertDetail() {
       if (raw === undefined || raw === null || raw === '') return null;
 
       let displayValue = raw;
-
-      // Если значение — служебное "__other__" — показываем ручной ввод
       if (raw === '__other__') {
         const manual = categoryFields[`${field.name}_manual`];
         if (!manual) return null;
         displayValue = manual;
       }
 
-      // Для select с {value, label} — показываем label
       if (field.type === 'select' && Array.isArray(field.options)) {
         const opt = field.options.find(
           (o) => (typeof o === 'object' ? o.value : o) === raw
@@ -94,9 +90,11 @@ function AdvertDetail() {
         if (opt && typeof opt === 'object') displayValue = opt.label;
       }
 
-      return { label: field.label, value: displayValue };
+      return { label: field.label, value: displayValue, name: field.name };
     })
     .filter(Boolean);
+
+  const vinField = characteristicsList.find(f => f.name === 'vin');
 
   return (
     <>
@@ -107,12 +105,7 @@ function AdvertDetail() {
       <div className="advert-detail">
         <div className="advert-image-block">
           {advert.image_url ? (
-            <img
-              src={advert.image_url}
-              alt={advert.title}
-              className="advert-image"
-              onClick={() => setLightbox(true)}
-            />
+            <img src={advert.image_url} alt={advert.title} className="advert-image" onClick={() => setLightbox(true)} />
           ) : (
             <div className="advert-image-placeholder">📦</div>
           )}
@@ -125,14 +118,13 @@ function AdvertDetail() {
           {advert.quantity > 1 && (
             <p className="advert-quantity">В наличии: {advert.quantity} шт.</p>
           )}
-          <p className="advert-category">Категория: {advert.category_name || '—'}</p>
+          <p className="advert-category">📍 {advert.city || 'Город не указан'} • Категория: {advert.category_name || '—'}</p>
 
           <div className="advert-block">
             <h3 className="advert-section-title">Описание</h3>
             <p className="advert-description">{advert.description}</p>
           </div>
 
-          {/* === Блок характеристик === */}
           {characteristicsList.length > 0 && (
             <div className="advert-block">
               <h3 className="advert-section-title">Характеристики</h3>
@@ -148,6 +140,22 @@ function AdvertDetail() {
             </div>
           )}
 
+          {/* Блок проверки авто по VIN */}
+          {vinField && (
+            <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f7fa', borderRadius: '10px', border: '1px solid #cceeff' }}>
+              <h3 style={{ margin: '0 0 10px', fontSize: '16px' }}>🚗 Проверка истории автомобиля</h3>
+              <p style={{ margin: '0 0 10px', fontSize: '14px' }}>VIN: <b>{vinField.value}</b></p>
+              <a 
+                href={`https://гибдд.рф/check/auto#${vinField.value}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#0066cc', color: '#fff', textDecoration: 'none', borderRadius: '6px', fontWeight: 'bold' }}
+              >
+                🔍 Проверить на ГИБДД
+              </a>
+            </div>
+          )}
+
           {advert.is_wholesale && (
             <div className="advert-wholesale-block">
               <h3>Оптовое предложение</h3>
@@ -155,11 +163,7 @@ function AdvertDetail() {
               {advert.wholesale_conditions && (
                 <ul className="advert-wholesale-list">
                   <li>Предоплата: {advert.wholesale_conditions.prepayment}%</li>
-                  <li>
-                    {advert.wholesale_conditions.only_business
-                      ? 'Только для бизнеса'
-                      : 'Доступно и частным лицам'}
-                  </li>
+                  <li>{advert.wholesale_conditions.only_business ? 'Только для бизнеса' : 'Доступно и частным лицам'}</li>
                 </ul>
               )}
             </div>
@@ -170,37 +174,32 @@ function AdvertDetail() {
             <p className="advert-seller-name">👤 {advert.user_username}</p>
             {isOwner ? (
               <div style={styles.ownerActions}>
-                <button onClick={handleEdit} style={styles.editButton}>
-                  ✏️ Редактировать
-                </button>
-                <button onClick={handleDelete} style={styles.deleteButton}>
-                  🗑️ Удалить
-                </button>
+                <button onClick={handleEdit} style={styles.editButton}>✏️ Редактировать</button>
+                <button onClick={handleDelete} style={styles.deleteButton}>🗑️ Удалить</button>
               </div>
             ) : (
-              <button
-                onClick={handleContact}
-                disabled={startingChat}
-                className="advert-contact-button"
-              >
+              <button onClick={handleContact} disabled={startingChat} className="advert-contact-button">
                 {startingChat ? 'Открываем чат...' : '💬 Связаться с продавцом'}
               </button>
             )}
           </div>
+
+          {/* ЮРИДИЧЕСКИЙ ДИСКЛЕЙМЕР */}
+          <div style={styles.disclaimer}>
+            <p style={{ margin: 0, fontWeight: 'bold', marginBottom: '5px' }}>⚠️ Важная информация</p>
+            <p style={{ margin: 0 }}>
+              Администрация сайта не несёт ответственности за полноту и достоверность сведений, указанных в объявлениях.
+              Информацию о недвижимости можно проверить в Росреестре или МФЦ. Сведения о транспортных средствах — на официальном сайте ГИБДД. 
+              Мы также не несём ответственности за переходы на сторонние мессенджеры.
+            </p>
+          </div>
+
         </div>
 
         {lightbox && advert.image_url && (
           <div className="advert-lightbox" onClick={() => setLightbox(false)}>
-            <button
-              className="advert-lightbox-close"
-              onClick={() => setLightbox(false)}
-            >✕</button>
-            <img
-              src={advert.image_url}
-              alt={advert.title}
-              className="advert-lightbox-image"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <button className="advert-lightbox-close" onClick={() => setLightbox(false)}>✕</button>
+            <img src={advert.image_url} alt={advert.title} className="advert-lightbox-image" onClick={(e) => e.stopPropagation()} />
           </div>
         )}
       </div>
@@ -210,61 +209,14 @@ function AdvertDetail() {
 
 const styles = {
   ownerActions: { display: 'flex', gap: '10px', flexWrap: 'wrap' },
-  editButton: {
-    flex: 1,
-    minWidth: '140px',
-    padding: '14px',
-    backgroundColor: '#00F0FF',
-    color: '#1a1a2e',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: 'bold',
-    fontFamily: 'inherit',
-    boxShadow: '0 0 15px rgba(0, 240, 255, 0.4)',
-  },
-  deleteButton: {
-    flex: 1,
-    minWidth: '140px',
-    padding: '14px',
-    backgroundColor: '#FF4444',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: 'bold',
-    fontFamily: 'inherit',
-  },
-  // Стили таблицы характеристик
-  specs: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    marginTop: '8px',
-  },
-  specRow: {
-    display: 'flex',
-    alignItems: 'baseline',
-    gap: '8px',
-    fontSize: '15px',
-  },
-  specLabel: {
-    color: '#666',
-    whiteSpace: 'nowrap',
-  },
-  specDots: {
-    flex: 1,
-    borderBottom: '1px dotted #ccc',
-    marginBottom: '3px',
-    minWidth: '20px',
-  },
-  specValue: {
-    fontWeight: '500',
-    textAlign: 'right',
-    color: '#1a1a2e',
-  },
+  editButton: { flex: 1, minWidth: '140px', padding: '14px', backgroundColor: '#00F0FF', color: '#1a1a2e', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', fontWeight: 'bold', fontFamily: 'inherit', boxShadow: '0 0 15px rgba(0, 240, 255, 0.4)' },
+  deleteButton: { flex: 1, minWidth: '140px', padding: '14px', backgroundColor: '#FF4444', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', fontWeight: 'bold', fontFamily: 'inherit' },
+  specs: { display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' },
+  specRow: { display: 'flex', alignItems: 'baseline', gap: '8px', fontSize: '15px' },
+  specLabel: { color: '#666', whiteSpace: 'nowrap' },
+  specDots: { flex: 1, borderBottom: '1px dotted #ccc', marginBottom: '3px', minWidth: '20px' },
+  specValue: { fontWeight: '500', textAlign: 'right', color: '#1a1a2e' },
+  disclaimer: { marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee', fontSize: '12px', color: '#888', lineHeight: '1.5' }
 };
 
 export default AdvertDetail;

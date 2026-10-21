@@ -33,6 +33,7 @@ export const CATEGORY_FIELDS = {
     { name: 'drive', label: 'Привод', type: 'select', options: ['Передний', 'Задний', 'Полный'] },
     { name: 'condition', label: 'Состояние', type: 'select', options: ['Новое', 'Отличное', 'Хорошее', 'Требует ремонта'] },
     { name: 'owners', label: 'Владельцев по ПТС', type: 'select', options: ['1', '2', '3', '4+'] },
+    { name: 'vin', label: 'VIN (номер кузова)', type: 'text', placeholder: 'XTA210990Y2777777' },
   ],
 
   // 3. Электроника
