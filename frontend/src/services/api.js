@@ -86,6 +86,7 @@ export const sendMessage = (chatId, data) => {
       : { 'Content-Type': 'application/json' },
   });
 };
+
 export const getUnreadCount = () => api.get('/chats/unread/');
 
 // Избранное (ВОТ ТУТ ИСПРАВЛЕНЫ ПУТИ!)

@@ -64,7 +64,7 @@ function ChatPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleSend = async (e) => {
+    const handleSend = async (e) => {
     e.preventDefault();
     if (!text.trim() && !image) return;
 
@@ -74,11 +74,12 @@ function ChatPage() {
       formData.append('text', text);
       if (image) formData.append('image', image);
 
-      const res = await sendMessage(id, formData); // Отправляем FormData
+      const res = await sendMessage(id, formData); // <-- Обрати внимание: передаем formData
       setMessages([...messages, res.data]);
       setText('');
       clearImage();
     } catch (err) {
+      console.error(err.response?.data || err); // <-- Добавил вывод ошибки в консоль
       alert('Ошибка при отправке');
     } finally {
       setSending(false);
