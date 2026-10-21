@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getAdvert, updateAdvert, getCategories } from '../services/api';
 import { getFieldsForCategory, normalizeOptions } from '../utils/categoryFields';
 import { getCatalogList } from '../utils/catalogs';
+import { CITIES } from '../utils/cities'; // <-- ДОБАВЛЕН ИМПОРТ ГОРОДОВ
 import BackButton from '../components/BackButton';
 
 function EditAdvertPage() {
@@ -14,6 +15,7 @@ function EditAdvertPage() {
     price: '',
     quantity: 1,
     category: '',
+    city: 'Москва', // <-- ДОБАВЛЕН ГОРОД
     is_wholesale: false,
   });
   const [categoryFields, setCategoryFields] = useState({});
@@ -35,9 +37,9 @@ function EditAdvertPage() {
           price: a.price,
           quantity: a.quantity,
           category: a.category,
+          city: a.city || 'Москва', // <-- ПОДТЯГИВАЕМ ГОРОД
           is_wholesale: a.is_wholesale,
         });
-        // Предзаполняем динамические поля
         if (a.category_fields && typeof a.category_fields === 'object') {
           setCategoryFields(a.category_fields);
         }
@@ -103,12 +105,12 @@ function EditAdvertPage() {
       formData.append('price', form.price);
       formData.append('quantity', form.quantity);
       formData.append('category', form.category);
+      formData.append('city', form.city); // <-- ДОБАВЛЕН ГОРОД В ОТПРАВКУ
       formData.append('is_wholesale', form.is_wholesale);
       formData.append('wholesale_conditions', JSON.stringify(
         { prepayment: 0, only_business: false }
       ));
 
-      // Чистим category_fields от _manual
       const cleanFields = { ...categoryFields };
       Object.keys(cleanFields).forEach((key) => {
         if (key.endsWith('_manual')) {
@@ -153,11 +155,7 @@ function EditAdvertPage() {
     if (field.type === 'select') {
       const options = normalizeOptions(field.options);
       return (
-        <select
-          className="form-input"
-          value={value}
-          onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
-        >
+        <select className="form-input" value={value} onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}>
           <option value="">— Выберите —</option>
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -178,17 +176,12 @@ function EditAdvertPage() {
         );
       }
 
-      // Если сохранённое значение не входит в список (был ручной ввод)
       const isInList = list.includes(value);
       const isOther = value === '__other__' || (value && !isInList);
 
       return (
         <>
-          <select
-            className="form-input"
-            value={isOther ? '__other__' : value}
-            onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
-          >
+          <select className="form-input" value={isOther ? '__other__' : value} onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}>
             <option value="">— Выберите —</option>
             {list.map((item) => (
               <option key={item} value={item}>{item}</option>
@@ -260,6 +253,12 @@ function EditAdvertPage() {
           </div>
         </div>
 
+        {/* --- БЛОК ГОРОДА --- */}
+        <label className="form-label">Город *</label>
+        <select name="city" value={form.city} onChange={handleChange} required className="form-input">
+          {CITIES.filter(c => c !== 'Вся Россия').map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+
         <label className="form-label">Категория *</label>
         <select name="category" value={form.category} onChange={handleCategoryChange} required className="form-input">
           <option value="">— Выберите категорию —</option>
@@ -297,18 +296,8 @@ const styles = {
   row: { display: 'flex', gap: '15px' },
   col: { flex: 1, display: 'flex', flexDirection: 'column' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px', fontSize: '14px', cursor: 'pointer' },
-  dynamicBlock: {
-    marginTop: '20px',
-    padding: '16px',
-    borderRadius: '10px',
-    backgroundColor: '#f5f7fa',
-    border: '1px solid #e1e5ea',
-  },
-  dynamicTitle: {
-    margin: '0 0 14px 0',
-    fontSize: '16px',
-    fontWeight: 'bold',
-  },
+  dynamicBlock: { marginTop: '20px', padding: '16px', borderRadius: '10px', backgroundColor: '#f5f7fa', border: '1px solid #e1e5ea' },
+  dynamicTitle: { margin: '0 0 14px 0', fontSize: '16px', fontWeight: 'bold' },
 };
 
 export default EditAdvertPage;

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { createAdvert, getCategories } from '../services/api';
 import { getFieldsForCategory, normalizeOptions } from '../utils/categoryFields';
 import { getCatalogList } from '../utils/catalogs';
+import { CITIES } from '../utils/cities'; // <-- ДОБАВЛЕН ИМПОРТ ГОРОДОВ
 import BackButton from './BackButton';
 
 function CreateAdvert() {
@@ -12,6 +13,7 @@ function CreateAdvert() {
     price: '',
     quantity: 1,
     category: '',
+    city: 'Москва', // <-- ДОБАВЛЕН ГОРОД
     is_wholesale: false,
   });
   const [categoryFields, setCategoryFields] = useState({});
@@ -41,26 +43,20 @@ function CreateAdvert() {
   const handleCategoryFieldChange = (name, value) => {
     setCategoryFields((prev) => {
       const updated = { ...prev, [name]: value };
-
-      // Если поменялся vehicle_type — сбрасываем brand и model
       if (name === 'vehicle_type') {
         delete updated.brand;
         delete updated.model;
       }
-      // Если поменялся product_type (электроника) — сбрасываем brand
       if (name === 'product_type') {
         delete updated.brand;
       }
-      // Если поменялся brand — сбрасываем model
       if (name === 'brand') {
         delete updated.model;
       }
-
       return updated;
     });
   };
 
-  // Ручной ввод, если в каталоге нет (через "Другое")
   const handleManualChange = (name, value) => {
     setCategoryFields((prev) => ({ ...prev, [`${name}_manual`]: value }));
   };
@@ -94,20 +90,19 @@ function CreateAdvert() {
       formData.append('price', form.price);
       formData.append('quantity', form.quantity);
       formData.append('category', form.category);
+      formData.append('city', form.city); // <-- ДОБАВЛЕН ГОРОД В ОТПРАВКУ
       formData.append('is_wholesale', form.is_wholesale);
       formData.append('wholesale_conditions', JSON.stringify(
         { prepayment: 0, only_business: false }
       ));
 
-      // Фильтруем category_fields: убираем _manual, если основной выбран
       const cleanFields = { ...categoryFields };
       Object.keys(cleanFields).forEach((key) => {
         if (key.endsWith('_manual')) {
           const base = key.replace('_manual', '');
-          if (cleanFields[base] && cleanFields[base] !== 'Другое') {
+          if (cleanFields[base] && cleanFields[base] !== '__other__') {
             delete cleanFields[key];
           } else {
-            // Если основное — "Другое" или пусто, используем ручной ввод
             cleanFields[base] = cleanFields[key];
             delete cleanFields[key];
           }
@@ -141,19 +136,13 @@ function CreateAdvert() {
   const isLimitError = error.toLowerCase().includes('лимит');
   const dynamicFields = getFieldsForCategory(form.category);
 
-  // Отрисовка одного поля
   const renderField = (field) => {
     const value = categoryFields[field.name] || '';
 
-    // === SELECT ===
     if (field.type === 'select') {
       const options = normalizeOptions(field.options);
       return (
-        <select
-          className="form-input"
-          value={value}
-          onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
-        >
+        <select className="form-input" value={value} onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}>
           <option value="">— Выберите —</option>
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -162,12 +151,10 @@ function CreateAdvert() {
       );
     }
 
-    // === DEPENDENT (зависимый селект) ===
     if (field.type === 'dependent') {
       const filterValue = field.dependsOn ? categoryFields[field.dependsOn] : null;
       const list = getCatalogList(field.catalogKey, filterValue);
 
-      // Если зависит от чего-то, а родитель ещё не выбран — блокируем
       if (field.dependsOn && !filterValue) {
         return (
           <select className="form-input" disabled>
@@ -179,11 +166,7 @@ function CreateAdvert() {
       const isOther = value === '__other__';
       return (
         <>
-          <select
-            className="form-input"
-            value={isOther ? '__other__' : value}
-            onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}
-          >
+          <select className="form-input" value={isOther ? '__other__' : value} onChange={(e) => handleCategoryFieldChange(field.name, e.target.value)}>
             <option value="">— Выберите —</option>
             {list.map((item) => (
               <option key={item} value={item}>{item}</option>
@@ -205,7 +188,6 @@ function CreateAdvert() {
       );
     }
 
-    // === TEXT / NUMBER ===
     return (
       <input
         type={field.type === 'number' ? 'number' : 'text'}
@@ -241,45 +223,17 @@ function CreateAdvert() {
 
       <form onSubmit={handleSubmit} className="form">
         <label className="form-label">Название *</label>
-        <input
-          name="title"
-          placeholder="Например: iPhone 15 Pro, 256 ГБ"
-          onChange={handleChange}
-          required
-          className="form-input"
-        />
+        <input name="title" placeholder="Например: iPhone 15 Pro, 256 ГБ" onChange={handleChange} required className="form-input" />
 
         <label className="form-label">Описание *</label>
-        <textarea
-          name="description"
-          placeholder="Состояние, комплектация, детали..."
-          onChange={handleChange}
-          required
-          rows="5"
-          className="form-input"
-          style={{ resize: 'vertical' }}
-        />
+        <textarea name="description" placeholder="Состояние, комплектация, детали..." onChange={handleChange} required rows="5" className="form-input" style={{ resize: 'vertical' }} />
 
         <label className="form-label">Фото товара</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="form-input"
-          style={{ border: '1px dashed #aaa', backgroundColor: '#fafafa' }}
-        />
+        <input type="file" accept="image/*" onChange={handleImageChange} className="form-input" style={{ border: '1px dashed #aaa', backgroundColor: '#fafafa' }} />
         {imagePreview && (
           <div style={{ marginTop: '10px', textAlign: 'center' }}>
-            <img
-              src={imagePreview}
-              alt="Превью"
-              style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px' }}
-            />
-            <button
-              type="button"
-              onClick={() => { setImage(null); setImagePreview(null); }}
-              style={{ display: 'block', margin: '8px auto 0', padding: '6px 14px', backgroundColor: '#fde8e8', color: '#c0392b', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
-            >
+            <img src={imagePreview} alt="Превью" style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px' }} />
+            <button type="button" onClick={() => { setImage(null); setImagePreview(null); }} style={{ display: 'block', margin: '8px auto 0', padding: '6px 14px', backgroundColor: '#fde8e8', color: '#c0392b', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>
               Удалить фото
             </button>
           </div>
@@ -288,36 +242,22 @@ function CreateAdvert() {
         <div style={styles.row}>
           <div style={styles.col}>
             <label className="form-label">Цена, ₽ *</label>
-            <input
-              name="price"
-              type="number"
-              placeholder="89990"
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
+            <input name="price" type="number" placeholder="89990" onChange={handleChange} required className="form-input" />
           </div>
           <div style={styles.col}>
             <label className="form-label">Количество</label>
-            <input
-              name="quantity"
-              type="number"
-              min="1"
-              value={form.quantity}
-              onChange={handleChange}
-              className="form-input"
-            />
+            <input name="quantity" type="number" min="1" value={form.quantity} onChange={handleChange} className="form-input" />
           </div>
         </div>
 
+        {/* --- БЛОК ГОРОДА --- */}
+        <label className="form-label">Город *</label>
+        <select name="city" value={form.city} onChange={handleChange} required className="form-input">
+          {CITIES.filter(c => c !== 'Вся Россия').map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+
         <label className="form-label">Категория *</label>
-        <select
-          name="category"
-          value={form.category}
-          onChange={handleCategoryChange}
-          required
-          className="form-input"
-        >
+        <select name="category" value={form.category} onChange={handleCategoryChange} required className="form-input">
           <option value="">— Выберите категорию —</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -337,12 +277,7 @@ function CreateAdvert() {
         )}
 
         <label style={styles.checkboxLabel}>
-          <input
-            name="is_wholesale"
-            type="checkbox"
-            checked={form.is_wholesale}
-            onChange={handleChange}
-          />
+          <input name="is_wholesale" type="checkbox" checked={form.is_wholesale} onChange={handleChange} />
           Оптовое предложение
         </label>
 
@@ -358,18 +293,8 @@ const styles = {
   row: { display: 'flex', gap: '15px' },
   col: { flex: 1, display: 'flex', flexDirection: 'column' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px', fontSize: '14px', cursor: 'pointer' },
-  dynamicBlock: {
-    marginTop: '20px',
-    padding: '16px',
-    borderRadius: '10px',
-    backgroundColor: '#f5f7fa',
-    border: '1px solid #e1e5ea',
-  },
-  dynamicTitle: {
-    margin: '0 0 14px 0',
-    fontSize: '16px',
-    fontWeight: 'bold',
-  },
+  dynamicBlock: { marginTop: '20px', padding: '16px', borderRadius: '10px', backgroundColor: '#f5f7fa', border: '1px solid #e1e5ea' },
+  dynamicTitle: { margin: '0 0 14px 0', fontSize: '16px', fontWeight: 'bold' },
 };
 
 export default CreateAdvert;

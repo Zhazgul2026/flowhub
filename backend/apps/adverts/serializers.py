@@ -14,16 +14,13 @@ class AdvertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advert
         fields = ('id', 'user', 'user_username', 'title', 'description', 'price', 'quantity',
-                  'category', 'category_name', 'image', 'image_url', 'is_wholesale',
+                  'category', 'category_name', 'city', 'image', 'image_url', 'is_wholesale',
                   'wholesale_conditions', 'category_fields', 'status', 'views_count', 'created_at',
                   'expires_at')
         read_only_fields = ('user', 'status', 'views_count')
 
     def get_image_url(self, obj):
         if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
             return obj.image.url
         return None
 

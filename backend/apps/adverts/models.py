@@ -9,6 +9,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    city = models.CharField(max_length=100, default='Москва', db_index=True) # <-- ДОБАВИТЬ ВОТ ЭТУ СТРОКУ
+    title = models.CharField(max_length=200)
+
 class Advert(models.Model):
     STATUS_CHOICES = (
         ('moderation', 'На модерации'),

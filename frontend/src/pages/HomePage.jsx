@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getAdverts, getCategories } from '../services/api';
+import { CITIES } from '../utils/cities';
 
 function HomePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [adverts, setAdverts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [search, setSearch] = useState('');
+  const searchFromUrl = searchParams.get('search') || '';
+
+  const [selectedCity, setSelectedCity] = useState('Вся Россия');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
@@ -23,58 +27,41 @@ function HomePage() {
     const params = {};
     if (selectedCategory) params.category = selectedCategory;
     if (onlyWholesale) params.is_wholesale = true;
+    if (searchFromUrl) params.search = searchFromUrl;
+    if (priceMin) params.price_min = priceMin;
+    if (priceMax) params.price_max = priceMax;
+    if (selectedCity && selectedCity !== 'Вся Россия') params.city = selectedCity;
 
     getAdverts(params)
       .then((res) => setAdverts(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [selectedCategory, onlyWholesale]);
+  }, [selectedCategory, onlyWholesale, searchFromUrl, priceMin, priceMax, selectedCity]);
 
-  const filteredAdverts = adverts
-    .filter((a) => {
-      if (search && !a.title.toLowerCase().includes(search.toLowerCase())) return false;
-      if (priceMin && parseFloat(a.price) < parseFloat(priceMin)) return false;
-      if (priceMax && parseFloat(a.price) > parseFloat(priceMax)) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'price_asc') return parseFloat(a.price) - parseFloat(b.price);
-      if (sortBy === 'price_desc') return parseFloat(b.price) - parseFloat(a.price);
-      return new Date(b.created_at) - new Date(a.created_at);
-    });
+  const sortedAdverts = [...adverts].sort((a, b) => {
+    if (sortBy === 'price_asc') return parseFloat(a.price) - parseFloat(b.price);
+    if (sortBy === 'price_desc') return parseFloat(b.price) - parseFloat(a.price);
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  };
-
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
   const formatPrice = (price) => new Intl.NumberFormat('ru-RU').format(price);
 
   const resetFilters = () => {
-    setSearch('');
     setSelectedCategory('');
     setPriceMin('');
     setPriceMax('');
     setOnlyWholesale(false);
     setSortBy('newest');
+    setSearchParams({});
   };
 
-  const handleSearch = () => {
-    window.scrollTo({ top: 400, behavior: 'smooth' });
-  };
-
-  const hasActiveFilters = !!(selectedCategory || search || priceMin || priceMax || onlyWholesale);
+  const hasActiveFilters = !!(selectedCategory || searchFromUrl || priceMin || priceMax || onlyWholesale || selectedCity !== 'Вся Россия');
 
   const categoryIcons = {
-    'Недвижимость': '🏠',
-    'Транспорт': '🚗',
-    'Электроника': '📱',
-    'Одежда и обувь': '👕',
-    'Дом и сад': '🏡',
-    'Работа и услуги': '💼',
-    'Животные': '🐾',
-    'Хобби и отдых': '🎨',
-    'Коллекции и антиквариат': '🏺',
+    'Недвижимость': '🏠', 'Транспорт': '🚗', 'Электроника': '📱',
+    'Одежда и обувь': '👕', 'Дом и сад': '🏡', 'Работа и услуги': '💼',
+    'Животные': '🐾', 'Хобби и отдых': '🎨', 'Коллекции и антиквариат': '🏺',
   };
 
   return (
@@ -91,9 +78,7 @@ function HomePage() {
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => {
-                setSelectedCategory(selectedCategory === cat.id ? '' : cat.id);
-              }}
+              onClick={() => setSelectedCategory(selectedCategory === cat.id ? '' : cat.id)}
               className="category-card"
               style={{
                 borderColor: selectedCategory === cat.id ? '#00F0FF' : '#e0e0e0',
@@ -109,82 +94,50 @@ function HomePage() {
       </section>
 
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Объявления</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Объявления</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '20px' }}>📍</span>
+            <select 
+              value={selectedCity} 
+              onChange={(e) => setSelectedCity(e.target.value)}
+              style={{ padding: '10px 15px', borderRadius: '8px', border: '2px solid #00F0FF', fontSize: '16px', fontWeight: 'bold', outline: 'none', cursor: 'pointer', backgroundColor: '#fff' }}
+            >
+              {CITIES.map(city => <option key={city} value={city}>{city}</option>)}
+            </select>
+          </div>
+        </div>
+
         <div className="layout-grid">
           <aside className="sidebar">
             <h3 style={styles.filterTitle}>🔧 Фильтры</h3>
-
-            <label style={styles.label}>Поиск</label>
-            <input
-              type="text"
-              placeholder="Название товара..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={styles.input}
-            />
-
             <label style={styles.label}>Категория</label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              style={styles.input}
-            >
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} style={styles.input}>
               <option value="">Все категории</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
+              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
 
             <label style={styles.label}>Цена, ₽</label>
             <div style={styles.priceRow}>
-              <input
-                type="number"
-                placeholder="от"
-                value={priceMin}
-                onChange={(e) => setPriceMin(e.target.value)}
-                style={styles.priceInput}
-              />
-              <input
-                type="number"
-                placeholder="до"
-                value={priceMax}
-                onChange={(e) => setPriceMax(e.target.value)}
-                style={styles.priceInput}
-              />
+              <input type="number" placeholder="от" value={priceMin} onChange={(e) => setPriceMin(e.target.value)} style={styles.priceInput} />
+              <input type="number" placeholder="до" value={priceMax} onChange={(e) => setPriceMax(e.target.value)} style={styles.priceInput} />
             </div>
 
             <label style={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={onlyWholesale}
-                onChange={(e) => setOnlyWholesale(e.target.checked)}
-              />
+              <input type="checkbox" checked={onlyWholesale} onChange={(e) => setOnlyWholesale(e.target.checked)} />
               Только опт
             </label>
 
             <div style={styles.buttonsRow}>
-              <button onClick={handleSearch} style={styles.searchButton}>
-                🔍 Найти
-              </button>
-
-              <button
-                onClick={resetFilters}
-                style={{
-                  ...styles.resetButton,
-                  backgroundColor: hasActiveFilters ? '#00F0FF' : '#f0f0f0',
-                  color: hasActiveFilters ? '#1a1a2e' : '#666',
-                  fontWeight: hasActiveFilters ? 'bold' : 'normal',
-                  boxShadow: hasActiveFilters ? '0 0 15px rgba(0, 240, 255, 0.5)' : 'none',
-                }}
-              >
-                Сбросить {hasActiveFilters ? '✓' : ''}
+              <button onClick={resetFilters} style={{ ...styles.resetButton, backgroundColor: hasActiveFilters ? '#00F0FF' : '#f0f0f0', color: hasActiveFilters ? '#1a1a2e' : '#666', fontWeight: hasActiveFilters ? 'bold' : 'normal' }}>
+                Сбросить фильтры {hasActiveFilters ? '✓' : ''}
               </button>
             </div>
           </aside>
 
           <main style={styles.main}>
             <div style={styles.topBar}>
-              <span>Найдено: <b>{filteredAdverts.length}</b></span>
+              <span>Найдено: <b>{sortedAdverts.length}</b></span>
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={styles.sortSelect}>
                 <option value="newest">Сначала новые</option>
                 <option value="price_asc">Цена: по возрастанию</option>
@@ -194,11 +147,11 @@ function HomePage() {
 
             {loading ? (
               <p>Загрузка...</p>
-            ) : filteredAdverts.length === 0 ? (
-              <p>Ничего не найдено. Попробуйте изменить фильтры.</p>
+            ) : sortedAdverts.length === 0 ? (
+              <p>Ничего не найдено. Попробуйте изменить фильтры или выбрать другой город.</p>
             ) : (
               <div className="adverts-grid">
-                {filteredAdverts.map((advert) => (
+                {sortedAdverts.map((advert) => (
                   <Link key={advert.id} to={`/advert/${advert.id}`} style={styles.card}>
                     {advert.image_url ? (
                       <img src={advert.image_url} alt={advert.title} style={styles.cardImage} />
@@ -208,7 +161,7 @@ function HomePage() {
                     <div style={styles.cardBody}>
                       <h3 style={styles.cardTitle}>{advert.title}</h3>
                       <p style={styles.cardPrice}>{formatPrice(advert.price)} ₽</p>
-                      <p style={styles.cardCategory}>{advert.category_name || 'Без категории'}</p>
+                      <p style={styles.cardCategory}>{advert.category_name || 'Без категории'} • 📍 {advert.city || 'Не указан'}</p>
                       <div style={styles.cardFooter}>
                         <span>👤 {advert.user_username}</span>
                         <span>{formatDate(advert.created_at)}</span>
@@ -226,43 +179,19 @@ function HomePage() {
       <section style={styles.howSection}>
         <h2 style={styles.sectionTitle}>Как это работает</h2>
         <div style={styles.howGrid}>
-          <div style={styles.howCard}>
-            <div style={styles.howIcon}>1️⃣</div>
-            <h3 style={styles.howTitle}>Зарегистрируйтесь</h3>
-            <p style={styles.howText}>Создайте бесплатный аккаунт за 30 секунд.</p>
-          </div>
-          <div style={styles.howCard}>
-            <div style={styles.howIcon}>2️⃣</div>
-            <h3 style={styles.howTitle}>Подайте объявление</h3>
-            <p style={styles.howText}>Загрузите фото, укажите цену и описание.</p>
-          </div>
-          <div style={styles.howCard}>
-            <div style={styles.howIcon}>3️⃣</div>
-            <h3 style={styles.howTitle}>Общайтесь в чате</h3>
-            <p style={styles.howText}>Отвечайте покупателям прямо на сайте.</p>
-          </div>
+          <div style={styles.howCard}><div style={styles.howIcon}>1️⃣</div><h3 style={styles.howTitle}>Зарегистрируйтесь</h3><p style={styles.howText}>Создайте бесплатный аккаунт за 30 секунд.</p></div>
+          <div style={styles.howCard}><div style={styles.howIcon}>2️⃣</div><h3 style={styles.howTitle}>Подайте объявление</h3><p style={styles.howText}>Загрузите фото, укажите цену, город и описание.</p></div>
+          <div style={styles.howCard}><div style={styles.howIcon}>3️⃣</div><h3 style={styles.howTitle}>Общайтесь в чате</h3><p style={styles.howText}>Отвечайте покупателям прямо на сайте.</p></div>
         </div>
       </section>
 
       <footer style={styles.footer}>
         <div style={styles.footerContent}>
-          <div>
-            <h3 style={styles.footerTitle}>ЗипТап</h3>
-            <p style={styles.footerText}>Поток сделок. Центр притяжения.</p>
-          </div>
-          <div>
-            <h4 style={styles.footerHeading}>Разделы</h4>
-            <Link to="/" style={styles.footerLink}>Главная</Link>
-            <Link to="/create" style={styles.footerLink}>Подать объявление</Link>
-          </div>
-          <div>
-            <h4 style={styles.footerHeading}>О проекте</h4>
-            <p style={styles.footerText}>Честная торговля для всех.</p>
-          </div>
+          <div><h3 style={styles.footerTitle}>ЗипТап</h3><p style={styles.footerText}>Поток сделок. Центр притяжения.</p></div>
+          <div><h4 style={styles.footerHeading}>Разделы</h4><Link to="/" style={styles.footerLink}>Главная</Link><Link to="/create" style={styles.footerLink}>Подать объявление</Link></div>
+          <div><h4 style={styles.footerHeading}>О проекте</h4><p style={styles.footerText}>Честная торговля для всех.</p></div>
         </div>
-        <div style={styles.footerBottom}>
-          © 2026 ЗипТап. Все права защищены.
-        </div>
+        <div style={styles.footerBottom}>© 2026 ЗипТап. Все права защищены.</div>
       </footer>
     </div>
   );
@@ -278,30 +207,7 @@ const styles = {
   priceInput: { width: '50%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px', boxSizing: 'border-box' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '8px', margin: '15px 0', fontSize: '14px', cursor: 'pointer' },
   buttonsRow: { display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '15px' },
-  searchButton: {
-    width: '100%',
-    padding: '12px',
-    backgroundColor: '#00F0FF',
-    color: '#1a1a2e',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: 'bold',
-    transition: 'all 0.2s',
-    boxShadow: '0 0 15px rgba(0, 240, 255, 0.4)',
-    fontFamily: 'inherit',
-  },
-  resetButton: {
-    width: '100%',
-    padding: '10px',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'all 0.2s',
-    fontFamily: 'inherit',
-  },
+  resetButton: { width: '100%', padding: '10px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s', fontFamily: 'inherit' },
   main: { minWidth: 0 },
   topBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#666', flexWrap: 'wrap', gap: '10px' },
   sortSelect: { padding: '6px 10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px' },
