@@ -64,8 +64,9 @@ class ChatDetailView(generics.RetrieveAPIView):
 
 
 class SendMessageView(APIView):
-    """Отправить сообщение в чат."""
+    """Отправить сообщение в чат (с поддержкой фото)."""
     permission_classes = (permissions.IsAuthenticated,)
+    parser_classes = (MultiPartParser, FormParser) # <-- ВОТ ТУТ ДОБАВЛЕНА ПОДДЕРЖКА ФАЙЛОВ
 
     def post(self, request, chat_id):
         user = request.user
@@ -75,35 +76,20 @@ class SendMessageView(APIView):
             return Response({'error': 'Вы не участник этого чата'}, status=status.HTTP_403_FORBIDDEN)
 
         text = request.data.get('text', '').strip()
-        if not text:
-            return Response({'error': 'Пустое сообщение'}, status=status.HTTP_400_BAD_REQUEST)
+        image = request.FILES.get('image')
+
+        if not text and not image:
+            return Response({'error': 'Сообщение не может быть пустым'}, status=status.HTTP_400_BAD_REQUEST)
 
         message = Message.objects.create(
             chat=chat,
             sender=user,
             text=text,
+            image=image
         )
         chat.save()  # обновляет updated_at
 
         return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
-
-        @action(detail=True, methods=['post'], parser_classes=[MultiPartParser, FormParser])
-    def send(self, request, pk=None):
-        chat = self.get_object()
-        text = request.data.get('text', '')
-        image = request.FILES.get('image')
-        
-        if not text and not image:
-            return Response({'error': 'Сообщение не может быть пустым'}, status=400)
-
-        message = Message.objects.create(
-            chat=chat,
-            sender=request.user,
-            text=text,
-            image=image
-        )
-        serializer = MessageSerializer(message)
-        return Response(serializer.data)
 
 
 class UnreadCountView(APIView):
@@ -117,6 +103,3 @@ class UnreadCountView(APIView):
             chat__in=Chat.objects.filter(Q(buyer=user) | Q(seller=user))
         ).exclude(sender=user).count()
         return Response({'unread': count})
-
-
-# Авторские права: Крымская Жазгул Темеркановна (в девичестве Эсеналиева)
