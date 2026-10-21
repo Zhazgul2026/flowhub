@@ -7,7 +7,7 @@ function Header() {
   const location = useLocation();
   const [unread, setUnread] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false); // Меню профиля
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
   
   const isLoggedIn = !!localStorage.getItem('access_token');
@@ -86,6 +86,11 @@ function Header() {
                 💬 Чаты
                 {unread > 0 && <span style={styles.badge}>{unread}</span>}
               </Link>
+
+              {/* НОВАЯ ССЫЛКА НА ИЗБРАННОЕ */}
+              <Link to="/favorites" className="nav-link" onClick={closeMenu} style={{ marginRight: '15px' }}>
+                ❤️ Избранное
+              </Link>
               
               {/* ВЫПАДАЮЩЕЕ МЕНЮ ПРОФИЛЯ */}
               <div style={{ position: 'relative' }}>
@@ -100,7 +105,6 @@ function Header() {
                   <div style={styles.dropdown}>
                     <Link to="/profile" style={styles.dropdownItem} onClick={closeMenu}>Мой профиль</Link>
                     <Link to="/my-adverts" style={styles.dropdownItem} onClick={closeMenu}>Мои объявления</Link>
-                    <Link to="/favorites" style={styles.dropdownItem} onClick={closeMenu}>❤️ Избранное</Link>
                     <div style={{ borderTop: '1px solid #eee', margin: '5px 0' }}></div>
                     <button onClick={handleLogout} style={{ ...styles.dropdownItem, color: '#cc0000', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 15px', fontSize: '14px' }}>
                       🚪 Выйти
