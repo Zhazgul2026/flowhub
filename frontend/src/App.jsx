@@ -14,6 +14,7 @@ import PricingPage from './pages/PricingPage';
 import MyAdvertsPage from './pages/MyAdvertsPage';
 import Header from './components/Header';
 import InstallPWA from './components/InstallPWA';
+import FavoritesPage from './pages/FavoritesPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/advert/:id" element={<AdvertDetail />} />
         <Route path="/create" element={<CreateAdvert />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/verify" element={<VerifyPage />} />
         <Route path="/edit/:id" element={<EditAdvertPage />} />
         <Route path="/pricing" element={<PricingPage />} />

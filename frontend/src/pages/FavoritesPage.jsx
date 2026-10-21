@@ -42,7 +42,7 @@ function FavoritesPage() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
           {favorites.map((fav) => {
-            const advert = fav.advert; // Сюда бэкенд вложит объект объявления
+            const advert = fav.advert;
             return (
               <div key={fav.id} style={styles.card}>
                 <Link to={`/advert/${advert.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}>
