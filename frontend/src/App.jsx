@@ -12,12 +12,9 @@ import VerifyPage from './pages/VerifyPage';
 import PricingPage from './pages/PricingPage';
 import Header from './components/Header';
 import InstallPWA from './components/InstallPWA';
-import FavoritesPage from './pages/FavoritesPage'; // <-- Импорт в правильном месте
-
-// Если эти два файла у тебя лежат в components, а не в pages, 
-// то исправь путь на './components/EditAdvertPage' и './components/MyAdvertsPage'
-import EditAdvertPage from './components/EditAdvertPage'; 
-import MyAdvertsPage from './components/MyAdvertsPage'; 
+import FavoritesPage from './pages/FavoritesPage';
+import EditAdvertPage from './pages/EditAdvertPage';
+import MyAdvertsPage from './pages/MyAdvertsPage';
 
 function App() {
   return (

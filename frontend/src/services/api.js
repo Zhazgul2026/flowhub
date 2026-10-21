@@ -83,5 +83,5 @@ export const getUnreadCount = () => api.get('/chats/unread/');
 
 // Избранное (ВОТ ТУТ ИСПРАВЛЕНЫ ПУТИ!)
 export const getFavorites = () => api.get('/adverts/favorites/');
-export const addFavorite = (advertId) => api.post('/adverts/favorites/', { advert: advertId });
+export const addFavorite = (advertId) => api.post('/adverts/favorites/', { advert_id: advertId });
 export const removeFavorite = (favoriteId) => api.delete(`/adverts/favorites/${favoriteId}/`);
