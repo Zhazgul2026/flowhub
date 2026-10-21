@@ -64,6 +64,37 @@ function HomePage() {
     'Животные': '🐾', 'Хобби и отдых': '🎨', 'Коллекции и антиквариат': '🏺',
   };
 
+  // ФУНКЦИЯ УМНОГО ПРЕВЬЮ ДЛЯ КАРТОЧКИ
+  const getSmartPreview = (advert) => {
+    const fields = advert.category_fields || {};
+    const parts = [];
+    const catId = advert.category;
+
+    if (catId === 2) { // Транспорт
+      if (fields.brand && fields.model) parts.push(`${fields.brand} ${fields.model}`);
+      if (fields.year) parts.push(fields.year);
+      if (fields.mileage) parts.push(`${new Intl.NumberFormat('ru-RU').format(fields.mileage)} км`);
+    } else if (catId === 1) { // Недвижимость
+      if (fields.rooms) parts.push(`${fields.rooms}-комн.`);
+      if (fields.area) parts.push(`${fields.area} м²`);
+      if (fields.floor) parts.push(`${fields.floor} эт.`);
+    } else if (catId === 3) { // Электроника
+      if (fields.brand) parts.push(fields.brand);
+      if (fields.model) parts.push(fields.model);
+      if (fields.condition) parts.push(fields.condition);
+    } else {
+      // Для остальных — берем до 3-х значений
+      const vals = Object.values(fields).filter(v => v && v !== '__other__' && v !== '_manual');
+      parts.push(...vals.slice(0, 3));
+    }
+
+    if (parts.length === 0) {
+      return advert.category_name || 'Без категории';
+    }
+    
+    return parts.join(' • ');
+  };
+
   return (
     <div className="page-container">
       <div className="hero">
@@ -161,7 +192,15 @@ function HomePage() {
                     <div style={styles.cardBody}>
                       <h3 style={styles.cardTitle}>{advert.title}</h3>
                       <p style={styles.cardPrice}>{formatPrice(advert.price)} ₽</p>
-                      <p style={styles.cardCategory}>{advert.category_name || 'Без категории'} • 📍 {advert.city || 'Не указан'}</p>
+                      
+                      {/* ВЫВОДИМ УМНОЕ ПРЕВЬЮ И ГОРОД */}
+                      <p style={styles.cardCategory}>
+                        {getSmartPreview(advert)}
+                      </p>
+                      <p style={{ fontSize: '12px', color: '#999', margin: '0 0 10px' }}>
+                        📍 {advert.city || 'Не указан'}
+                      </p>
+
                       <div style={styles.cardFooter}>
                         <span>👤 {advert.user_username}</span>
                         <span>{formatDate(advert.created_at)}</span>
@@ -217,7 +256,7 @@ const styles = {
   cardBody: { padding: '12px', flex: 1, display: 'flex', flexDirection: 'column' },
   cardTitle: { fontSize: '15px', margin: '0 0 8px', minHeight: '38px', overflow: 'hidden' },
   cardPrice: { fontSize: '20px', fontWeight: 'bold', color: '#1a1a2e', margin: '0 0 5px' },
-  cardCategory: { fontSize: '12px', color: '#888', margin: '0 0 12px' },
+  cardCategory: { fontSize: '13px', color: '#444', margin: '0 0 5px', fontWeight: '500' },
   cardFooter: { display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#666', marginTop: 'auto' },
   wholesaleBadge: { position: 'absolute', top: '8px', right: '8px', backgroundColor: '#00F0FF', color: '#1a1a2e', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' },
   howSection: { marginBottom: '50px', padding: '40px 20px', backgroundColor: '#f9f9f9', borderRadius: '12px' },
