@@ -61,7 +61,7 @@ export const updateAdvert = (id, data) => {
 };
 
 export const deleteAdvert = (id) => api.delete(`/adverts/${id}/`);
-
+export const renewAdvert = (id) => api.post(`/adverts/${id}/renew/`);
 export const boostAdvert = (id) => api.post(`/adverts/${id}/boost/`);
 
 // Опт
@@ -80,8 +80,8 @@ export const getChat = (id) => api.get(`/chats/${id}/`);
 export const createChat = (advertId) => api.post('/chats/', { advert: advertId });
 export const sendMessage = (chatId, text) => api.post(`/chats/${chatId}/send/`, { text });
 export const getUnreadCount = () => api.get('/chats/unread/');
-export const renewAdvert = (id) => api.post(`/adverts/${id}/renew/`);
-// Избранное
-export const getFavorites = () => api.get('/favorites/');
-export const addFavorite = (advertId) => api.post('/favorites/', { advert: advertId });
-export const removeFavorite = (favoriteId) => api.delete(`/favorites/${favoriteId}/`);
+
+// Избранное (ВОТ ТУТ ИСПРАВЛЕНЫ ПУТИ!)
+export const getFavorites = () => api.get('/adverts/favorites/');
+export const addFavorite = (advertId) => api.post('/adverts/favorites/', { advert: advertId });
+export const removeFavorite = (favoriteId) => api.delete(`/adverts/favorites/${favoriteId}/`);

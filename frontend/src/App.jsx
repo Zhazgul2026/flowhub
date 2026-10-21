@@ -9,12 +9,15 @@ import AdvertDetail from './components/AdvertDetail';
 import CreateAdvert from './components/CreateAdvert';
 import Profile from './components/Profile';
 import VerifyPage from './pages/VerifyPage';
-import EditAdvertPage from './pages/EditAdvertPage';
 import PricingPage from './pages/PricingPage';
-import MyAdvertsPage from './pages/MyAdvertsPage';
 import Header from './components/Header';
 import InstallPWA from './components/InstallPWA';
-import FavoritesPage from './pages/FavoritesPage';
+import FavoritesPage from './pages/FavoritesPage'; // <-- Импорт в правильном месте
+
+// Если эти два файла у тебя лежат в components, а не в pages, 
+// то исправь путь на './components/EditAdvertPage' и './components/MyAdvertsPage'
+import EditAdvertPage from './components/EditAdvertPage'; 
+import MyAdvertsPage from './components/MyAdvertsPage'; 
 
 function App() {
   return (
@@ -40,7 +43,4 @@ function App() {
   );
 }
 
-import FavoritesPage from './pages/FavoritesPage';
-// ... в блоке <Routes>
-<Route path="/favorites" element={<FavoritesPage />} />
 export default App;
