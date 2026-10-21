@@ -38,4 +38,7 @@ function App() {
   );
 }
 
+import FavoritesPage from './pages/FavoritesPage';
+// ... в блоке <Routes>
+<Route path="/favorites" element={<FavoritesPage />} />
 export default App;

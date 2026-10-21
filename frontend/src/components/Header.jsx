@@ -101,6 +101,7 @@ function Header() {
                 💬 Мои чаты
                 {unread > 0 && <span className="nav-badge">{unread}</span>}
               </Link>
+              <Link to="/favorites" className="nav-link" onClick={closeMenu}>❤️ Избранное</Link>
               <Link to="/profile" className="nav-link" onClick={closeMenu}>
                 👤 {username || 'Профиль'}
               </Link>

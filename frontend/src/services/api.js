@@ -81,3 +81,7 @@ export const createChat = (advertId) => api.post('/chats/', { advert: advertId }
 export const sendMessage = (chatId, text) => api.post(`/chats/${chatId}/send/`, { text });
 export const getUnreadCount = () => api.get('/chats/unread/');
 export const renewAdvert = (id) => api.post(`/adverts/${id}/renew/`);
+// Избранное
+export const getFavorites = () => api.get('/favorites/');
+export const addFavorite = (advertId) => api.post('/favorites/', { advert: advertId });
+export const removeFavorite = (favoriteId) => api.delete(`/favorites/${favoriteId}/`);

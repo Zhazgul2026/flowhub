@@ -27,7 +27,6 @@ class Advert(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='adverts')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='adverts')
     
-    # 👇 ВОТ СЮДА МЫ ДОБАВИЛИ ГОРОД 👇
     city = models.CharField(max_length=100, default='Москва', db_index=True)
     
     title = models.CharField(max_length=200)
@@ -54,3 +53,18 @@ class Advert(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Favorite(models.Model):
+    # Вот тут очень важно, чтобы у полей был отступ (4 пробела)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites')
+    advert = models.ForeignKey(Advert, on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'advert') 
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
+
+    def __str__(self):
+        return f'{self.user.username} - {self.advert.title}'

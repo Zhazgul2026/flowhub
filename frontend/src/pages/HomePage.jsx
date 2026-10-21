@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { getAdverts, getCategories } from '../services/api';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { getAdverts, getCategories, getFavorites, addFavorite, removeFavorite } from '../services/api';
 import { CITIES } from '../utils/cities';
 
 function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [adverts, setAdverts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Состояние для избранного
+  const [favorites, setFavorites] = useState([]); // Массив объектов избранного
+  const isLoggedIn = !!localStorage.getItem('access_token');
 
   const searchFromUrl = searchParams.get('search') || '';
 
@@ -20,7 +25,10 @@ function HomePage() {
 
   useEffect(() => {
     getCategories().then((res) => setCategories(res.data)).catch(console.error);
-  }, []);
+    if (isLoggedIn) {
+      getFavorites().then((res) => setFavorites(res.data)).catch(console.error);
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     setLoading(true);
@@ -37,6 +45,31 @@ function HomePage() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [selectedCategory, onlyWholesale, searchFromUrl, priceMin, priceMax, selectedCity]);
+
+  // Логика добавления/удаления из избранного
+  const toggleFavorite = async (e, advertId) => {
+    e.preventDefault(); // Чтобы не переходить по ссылке карточки
+    if (!isLoggedIn) {
+      alert('Войдите, чтобы добавлять в избранное');
+      return navigate('/login');
+    }
+
+    const existingFav = favorites.find(f => f.advert.id === advertId);
+
+    try {
+      if (existingFav) {
+        // Удаляем
+        await removeFavorite(existingFav.id);
+        setFavorites(favorites.filter(f => f.id !== existingFav.id));
+      } else {
+        // Добавляем
+        const res = await addFavorite(advertId);
+        setFavorites([...favorites, res.data]);
+      }
+    } catch (err) {
+      alert('Ошибка при работе с избранным');
+    }
+  };
 
   const sortedAdverts = [...adverts].sort((a, b) => {
     if (sortBy === 'price_asc') return parseFloat(a.price) - parseFloat(b.price);
@@ -64,34 +97,29 @@ function HomePage() {
     'Животные': '🐾', 'Хобби и отдых': '🎨', 'Коллекции и антиквариат': '🏺',
   };
 
-  // ФУНКЦИЯ УМНОГО ПРЕВЬЮ ДЛЯ КАРТОЧКИ
   const getSmartPreview = (advert) => {
     const fields = advert.category_fields || {};
     const parts = [];
     const catId = advert.category;
 
-    if (catId === 2) { // Транспорт
+    if (catId === 2) {
       if (fields.brand && fields.model) parts.push(`${fields.brand} ${fields.model}`);
       if (fields.year) parts.push(fields.year);
       if (fields.mileage) parts.push(`${new Intl.NumberFormat('ru-RU').format(fields.mileage)} км`);
-    } else if (catId === 1) { // Недвижимость
+    } else if (catId === 1) {
       if (fields.rooms) parts.push(`${fields.rooms}-комн.`);
       if (fields.area) parts.push(`${fields.area} м²`);
       if (fields.floor) parts.push(`${fields.floor} эт.`);
-    } else if (catId === 3) { // Электроника
+    } else if (catId === 3) {
       if (fields.brand) parts.push(fields.brand);
       if (fields.model) parts.push(fields.model);
       if (fields.condition) parts.push(fields.condition);
     } else {
-      // Для остальных — берем до 3-х значений
       const vals = Object.values(fields).filter(v => v && v !== '__other__' && v !== '_manual');
       parts.push(...vals.slice(0, 3));
     }
 
-    if (parts.length === 0) {
-      return advert.category_name || 'Без категории';
-    }
-    
+    if (parts.length === 0) return advert.category_name || 'Без категории';
     return parts.join(' • ');
   };
 
@@ -182,33 +210,39 @@ function HomePage() {
               <p>Ничего не найдено. Попробуйте изменить фильтры или выбрать другой город.</p>
             ) : (
               <div className="adverts-grid">
-                {sortedAdverts.map((advert) => (
-                  <Link key={advert.id} to={`/advert/${advert.id}`} style={styles.card}>
-                    {advert.image_url ? (
-                      <img src={advert.image_url} alt={advert.title} style={styles.cardImage} />
-                    ) : (
-                      <div style={styles.imagePlaceholder}>📦</div>
-                    )}
-                    <div style={styles.cardBody}>
-                      <h3 style={styles.cardTitle}>{advert.title}</h3>
-                      <p style={styles.cardPrice}>{formatPrice(advert.price)} ₽</p>
-                      
-                      {/* ВЫВОДИМ УМНОЕ ПРЕВЬЮ И ГОРОД */}
-                      <p style={styles.cardCategory}>
-                        {getSmartPreview(advert)}
-                      </p>
-                      <p style={{ fontSize: '12px', color: '#999', margin: '0 0 10px' }}>
-                        📍 {advert.city || 'Не указан'}
-                      </p>
-
-                      <div style={styles.cardFooter}>
-                        <span>👤 {advert.user_username}</span>
-                        <span>{formatDate(advert.created_at)}</span>
+                {sortedAdverts.map((advert) => {
+                  const isFav = favorites.some(f => f.advert.id === advert.id);
+                  return (
+                    <Link key={advert.id} to={`/advert/${advert.id}`} style={styles.card}>
+                      <div style={{ position: 'relative' }}>
+                        {advert.image_url ? (
+                          <img src={advert.image_url} alt={advert.title} style={styles.cardImage} />
+                        ) : (
+                          <div style={styles.imagePlaceholder}>📦</div>
+                        )}
+                        {/* Кнопка сердечка */}
+                        <button 
+                          onClick={(e) => toggleFavorite(e, advert.id)}
+                          style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '35px', height: '35px', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          title={isFav ? 'Убрать из избранного' : 'В избранное'}
+                        >
+                          {isFav ? '❤️' : '🤍'}
+                        </button>
                       </div>
-                      {advert.is_wholesale && <span style={styles.wholesaleBadge}>ОПТ</span>}
-                    </div>
-                  </Link>
-                ))}
+                      <div style={styles.cardBody}>
+                        <h3 style={styles.cardTitle}>{advert.title}</h3>
+                        <p style={styles.cardPrice}>{formatPrice(advert.price)} ₽</p>
+                        <p style={styles.cardCategory}>{getSmartPreview(advert)}</p>
+                        <p style={{ fontSize: '12px', color: '#999', margin: '0 0 10px' }}>📍 {advert.city || 'Не указан'}</p>
+                        <div style={styles.cardFooter}>
+                          <span>👤 {advert.user_username}</span>
+                          <span>{formatDate(advert.created_at)}</span>
+                        </div>
+                        {advert.is_wholesale && <span style={styles.wholesaleBadge}>ОПТ</span>}
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </main>
