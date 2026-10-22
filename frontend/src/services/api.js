@@ -93,3 +93,4 @@ export const getUnreadCount = () => api.get('/chats/unread/');
 export const getFavorites = () => api.get('/adverts/favorites/');
 export const addFavorite = (advertId) => api.post('/adverts/favorites/', { advert_id: advertId });
 export const removeFavorite = (favoriteId) => api.delete(`/adverts/favorites/${favoriteId}/`);
+export const deleteMessage = (messageId) => api.delete(`/chats/messages/${messageId}/delete/`);

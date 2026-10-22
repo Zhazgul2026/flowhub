@@ -103,3 +103,17 @@ class UnreadCountView(APIView):
             chat__in=Chat.objects.filter(Q(buyer=user) | Q(seller=user))
         ).exclude(sender=user).count()
         return Response({'unread': count})
+
+        class DeleteMessageView(APIView):
+    """Удалить свое сообщение."""
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def delete(self, request, message_id):
+        message = get_object_or_404(Message, id=message_id)
+        
+        # Проверяем, что это его сообщение
+        if message.sender != request.user:
+            return Response({'error': 'Вы можете удалять только свои сообщения'}, status=status.HTTP_403_FORBIDDEN)
+
+        message.delete()
+        return Response({'message': 'Сообщение удалено'}, status=status.HTTP_200_OK)
