@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django_supabase_storage',  # <-- Перенесли сюда (перед staticfiles)
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -88,12 +89,25 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# ==========================================
+# НАСТРОЙКИ SUPABASE STORAGE
+# ==========================================
+# ВСТАВЬ СВОИ ДАННЫЕ ИЗ SUPABASE (Project Settings -> API)
+SUPABASE_URL = os.getenv('SUPABASE_URL', 'https://fnchqgqkfnyhzgnsvlnw.supabase.co')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY', 'sb_publishable_xWjg_QcyNhOwht9-sPDqkw_D2Vg8z2I')
+SUPABASE_MEDIA_BUCKET = 'media'
 
-# Для работы медиафайлов (фото) на хостинге
-WHITENOISE_MAX_AGE = 31536000
-WHITENOISE_ALLOW_ALL_ORIGINS = True
+STORAGES = {
+    "default": {
+        "BACKEND": "django_supabase_storage.SupabaseMediaStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+MEDIA_URL = '/media/'
+# ==========================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -104,7 +118,6 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     'http://localhost:3000'
 ).split(',')
 
-# Всегда разрешаем локальную разработку (безопасно — только для localhost)
 for origin in ['http://localhost:3000', 'http://127.0.0.1:3000']:
     if origin not in CORS_ALLOWED_ORIGINS:
         CORS_ALLOWED_ORIGINS.append(origin)
@@ -116,7 +129,6 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
     'http://localhost:3000'
 ).split(',')
 
-# То же для CSRF
 for origin in ['http://localhost:3000', 'http://127.0.0.1:3000']:
     if origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(origin)
@@ -138,12 +150,12 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
-# HTTPS-безопасность (в продакшене)
+
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 год
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
