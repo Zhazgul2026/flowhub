@@ -164,13 +164,17 @@ function ChatPage() {
                     {msg.text && <div style={{ fontSize: '15px', marginBottom: msg.image_url ? '8px' : 0, wordBreak: 'break-word' }}>{msg.text}</div>}
                     
                     {msg.image_url && (
-                      <img 
-                        src={msg.image_url} 
-                        alt="Фото" 
-                        style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px', display: 'block', cursor: 'zoom-in' }} 
-                        onClick={() => setLightboxImage(msg.image_url)}
-                      />
-                    )}
+                  <img 
+                   src={msg.image_url} 
+                   alt="Фото" 
+                  style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px', display: 'block', cursor: 'zoom-in', objectFit: 'cover' }} 
+                  onClick={() => setLightboxImage(msg.image_url)}
+                  onError={(e) => { 
+                  e.target.style.display = 'none'; // Скрываем, если не загрузилось
+                  e.target.insertAdjacentHTML('afterend', '<span style="font-size:13px;color:#fff;background:#555;padding:4px 8px;border-radius:4px;">Файл недоступен</span>');
+               }}
+              />
+            )}
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', gap: '10px' }}>
                       {isMine ? (
