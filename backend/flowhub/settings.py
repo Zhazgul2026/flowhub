@@ -8,9 +8,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
-
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 INSTALLED_APPS = [
@@ -19,7 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django_supabase_storage',  # <-- Перенесли сюда (перед staticfiles)
+    'django_supabase_storage',
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -92,13 +90,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # ==========================================
 # НАСТРОЙКИ SUPABASE STORAGE
 # ==========================================
-# ВСТАВЬ СВОИ ДАННЫЕ ИЗ SUPABASE (Project Settings -> API)
 SUPABASE_URL = os.getenv('SUPABASE_URL', 'https://fnchqgqkfnyhzgnsvlnw.supabase.co')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY', 'sb_publishable_xWjg_QcyNhOwht9-sPDqkw_D2Vg8z2I')
 SUPABASE_MEDIA_BUCKET = 'media'
-
-# Добавь эту строку, чтобы пакет корректно строил ссылки
-SUPABASE_STORAGE_TRUST_FILE_EXTENSION_CONTENT_TYPE = True 
+SUPABASE_STORAGE_TRUST_FILE_EXTENSION_CONTENT_TYPE = True
 
 STORAGES = {
     "default": {
@@ -113,41 +108,35 @@ MEDIA_URL = '/media/'
 # ==========================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 AUTH_USER_MODEL = 'users.User'
 
-CORS_ALLOWED_ORIGINS = os.getenv(
-    'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000'
-).split(',')
+# ==========================================
+# НАСТРОЙКИ CORS (ИСПРАВЛЕНЫ)
+# ==========================================
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://flowhub-eigb.vercel.app',
+    'https://www.ziptap.ru',
+]
 
-# Всегда разрешаем локальную разработку и Vercel
-for origin in ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://flowhub-eigb.vercel.app']:
-    if origin not in CORS_ALLOWED_ORIGINS:
-        CORS_ALLOWED_ORIGINS.append(origin)
-
-CORS_ALLOW_CREDENTIALS = True
-
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000'
-).split(',')
-
-# То же для CSRF
-for origin in ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://flowhub-eigb.vercel.app']:
-    if origin not in CSRF_TRUSTED_ORIGINS:
-        CSRF_TRUSTED_ORIGINS.append(origin)
+# На случай, если ты передаешь через env переменные
+env_cors = os.getenv('CORS_ALLOWED_ORIGINS')
+if env_cors:
+    CORS_ALLOWED_ORIGINS.extend(env_cors.split(','))
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000'
-).split(',')
-
-for origin in ['http://localhost:3000', 'http://127.0.0.1:3000']:
-    if origin not in CSRF_TRUSTED_ORIGINS:
-        CSRF_TRUSTED_ORIGINS.append(origin)
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://flowhub-eigb.vercel.app',
+    'https://www.ziptap.ru',
+]
+env_csrf = os.getenv('CSRF_TRUSTED_ORIGINS')
+if env_csrf:
+    CSRF_TRUSTED_ORIGINS.extend(env_csrf.split(','))
+# ==========================================
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
