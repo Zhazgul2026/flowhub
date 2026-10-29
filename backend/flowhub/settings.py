@@ -121,9 +121,22 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     'http://localhost:3000'
 ).split(',')
 
-for origin in ['http://localhost:3000', 'http://127.0.0.1:3000']:
+# Всегда разрешаем локальную разработку и Vercel
+for origin in ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://flowhub-eigb.vercel.app']:
     if origin not in CORS_ALLOWED_ORIGINS:
         CORS_ALLOWED_ORIGINS.append(origin)
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://localhost:3000'
+).split(',')
+
+# То же для CSRF
+for origin in ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://flowhub-eigb.vercel.app']:
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 CORS_ALLOW_CREDENTIALS = True
 
