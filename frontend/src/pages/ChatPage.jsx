@@ -165,7 +165,11 @@ function ChatPage() {
                     
                     {msg.image_url && (
                   <img 
-                   src={msg.image_url} 
+                   src={
+  msg.image_url.startsWith('/media/') 
+    ? `https://fnchqgqkfnyhzgnsvlnw.supabase.co/storage/v1/object/public${msg.image_url}`
+    : msg.image_url
+} 
                    alt="Фото" 
                   style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px', display: 'block', cursor: 'zoom-in', objectFit: 'cover' }} 
                   onClick={() => setLightboxImage(msg.image_url)}

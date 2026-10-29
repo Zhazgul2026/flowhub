@@ -97,6 +97,9 @@ SUPABASE_URL = os.getenv('SUPABASE_URL', 'https://fnchqgqkfnyhzgnsvlnw.supabase.
 SUPABASE_KEY = os.getenv('SUPABASE_KEY', 'sb_publishable_xWjg_QcyNhOwht9-sPDqkw_D2Vg8z2I')
 SUPABASE_MEDIA_BUCKET = 'media'
 
+# Добавь эту строку, чтобы пакет корректно строил ссылки
+SUPABASE_STORAGE_TRUST_FILE_EXTENSION_CONTENT_TYPE = True 
+
 STORAGES = {
     "default": {
         "BACKEND": "django_supabase_storage.SupabaseMediaStorage",
