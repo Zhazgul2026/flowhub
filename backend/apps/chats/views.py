@@ -52,7 +52,6 @@ class ChatDetailView(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         chat = self.get_object()
-        # Помечаем все входящие сообщения прочитанными
         chat.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
 
         serializer = self.get_serializer(chat)
@@ -66,7 +65,7 @@ class ChatDetailView(generics.RetrieveAPIView):
 class SendMessageView(APIView):
     """Отправить сообщение в чат (с поддержкой фото)."""
     permission_classes = (permissions.IsAuthenticated,)
-    parser_classes = (MultiPartParser, FormParser) # <-- ВОТ ТУТ ДОБАВЛЕНА ПОДДЕРЖКА ФАЙЛОВ
+    parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, chat_id):
         user = request.user
@@ -87,13 +86,13 @@ class SendMessageView(APIView):
             text=text,
             image=image
         )
-        chat.save()  # обновляет updated_at
+        chat.save()
 
         return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
 
 
 class UnreadCountView(APIView):
-    """Общее количество непрочитанных сообщений (для счётчика в шапке)."""
+    """Общее количество непрочитанных сообщений."""
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
@@ -104,14 +103,15 @@ class UnreadCountView(APIView):
         ).exclude(sender=user).count()
         return Response({'unread': count})
 
-        class DeleteMessageView(APIView):
+
+# ВОТ ЗДЕСЬ ОН ДОЛЖЕН БЫТЬ (на одном уровне с остальными)
+class DeleteMessageView(APIView):
     """Удалить свое сообщение."""
     permission_classes = (permissions.IsAuthenticated,)
 
     def delete(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
         
-        # Проверяем, что это его сообщение
         if message.sender != request.user:
             return Response({'error': 'Вы можете удалять только свои сообщения'}, status=status.HTTP_403_FORBIDDEN)
 
