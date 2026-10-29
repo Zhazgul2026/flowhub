@@ -12,7 +12,7 @@ function ChatPage() {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [lightboxImage, setLightboxImage] = useState(null); // Для просмотра фото
+  const [lightboxImage, setLightboxImage] = useState(null);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -27,12 +27,10 @@ function ChatPage() {
     loadChat();
   }, [id, isLoggedIn, navigate]);
 
-  // Скролл вниз при новом сообщении
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Автообновление чата
   useEffect(() => {
     const interval = setInterval(() => {
       if (isLoggedIn) loadChat();
@@ -40,7 +38,6 @@ function ChatPage() {
     return () => clearInterval(interval);
   }, [id, isLoggedIn]);
 
-  // Закрытие лайтбокса по Escape
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') setLightboxImage(null);
@@ -53,7 +50,6 @@ function ChatPage() {
     getChat(id)
       .then((res) => {
         setChat(res.data.chat);
-        // Обновляем только если количество сообщений изменилось (чтобы не дергался экран)
         setMessages((prev) => {
             if (prev.length !== res.data.messages.length) return res.data.messages;
             return prev;
@@ -102,7 +98,6 @@ function ChatPage() {
     }
   };
 
-  // Удаление сообщения
   const handleDeleteMessage = async (msgId) => {
     if (!window.confirm('Удалить это сообщение?')) return;
     try {
@@ -116,6 +111,16 @@ function ChatPage() {
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // ВОТ ЭТА ФУНКЦИЯ ДОБАВЛЯЕТ ПРАВИЛЬНЫЙ АДРЕС SUPABASE
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('/media/')) {
+      // Подставляем твой Project URL из Supabase
+      return `https://fnchqgqkfnyhzgnsvlnw.supabase.co/storage/v1/object/public${url}`;
+    }
+    return url;
   };
 
   if (loading) return <p style={{ padding: '20px' }}>Загрузка...</p>;
@@ -163,22 +168,19 @@ function ChatPage() {
                     
                     {msg.text && <div style={{ fontSize: '15px', marginBottom: msg.image_url ? '8px' : 0, wordBreak: 'break-word' }}>{msg.text}</div>}
                     
+                    {/* ВЫВОДИМ КАРТИНКУ С ПРАВИЛЬНЫМ URL */}
                     {msg.image_url && (
-                  <img 
-                   src={
-  msg.image_url.startsWith('/media/') 
-    ? `https://fnchqgqkfnyhzgnsvlnw.supabase.co/storage/v1/object/public${msg.image_url}`
-    : msg.image_url
-} 
-                   alt="Фото" 
-                  style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px', display: 'block', cursor: 'zoom-in', objectFit: 'cover' }} 
-                  onClick={() => setLightboxImage(msg.image_url)}
-                  onError={(e) => { 
-                  e.target.style.display = 'none'; // Скрываем, если не загрузилось
-                  e.target.insertAdjacentHTML('afterend', '<span style="font-size:13px;color:#fff;background:#555;padding:4px 8px;border-radius:4px;">Файл недоступен</span>');
-               }}
-              />
-            )}
+                      <img 
+                        src={getImageUrl(msg.image_url)} 
+                        alt="Фото" 
+                        style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '8px', display: 'block', cursor: 'zoom-in', objectFit: 'cover' }} 
+                        onClick={() => setLightboxImage(getImageUrl(msg.image_url))}
+                        onError={(e) => { 
+                          e.target.style.display = 'none'; 
+                          e.target.insertAdjacentHTML('afterend', '<span style="font-size:13px;color:#fff;background:#555;padding:4px 8px;border-radius:4px;">Файл недоступен</span>');
+                        }}
+                      />
+                    )}
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', gap: '10px' }}>
                       {isMine ? (
