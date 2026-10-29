@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://ziptap-api.onrender.com/api';
+const API_URL = 'https://flowhub-eigb.vercel.app/api'; 
 
 const api = axios.create({
   baseURL: API_URL,
