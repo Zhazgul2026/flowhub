@@ -1,33 +1,16 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "backend/flowhub/wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "installCommand": "pip install -r backend/requirements.txt"
-      }
+  "services": {
+    "frontend": {
+      "root": "frontend/"
     },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+    "backend": {
+      "root": "backend/",
+      "entrypoint": "flowhub.wsgi:application"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/flowhub/wsgi.py"
-    },
-    {
-      "src": "/admin/(.*)",
-      "dest": "backend/flowhub/wsgi.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/$1"
-    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": { "service": "backend" } },
+    { "source": "/admin/(.*)", "destination": { "service": "backend" } },
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]
 }
