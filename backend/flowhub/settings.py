@@ -100,9 +100,11 @@ STORAGES = {
         "BACKEND": "django_supabase_storage.SupabaseMediaStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "django_supabase_storage.SupabaseStaticStorage",
     },
 }
+
+SUPABASE_STATIC_BUCKET = 'static'
 
 MEDIA_URL = '/media/'
 # ==========================================
