@@ -34,7 +34,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',  <-- Убрали, так как статика теперь в Supabase
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -85,7 +85,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Убрали устаревшую STATICFILES_STORAGE, она конфликтует с STORAGES
 
 # ==========================================
 # НАСТРОЙКИ SUPABASE STORAGE
@@ -93,6 +93,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 SUPABASE_URL = os.getenv('SUPABASE_URL', 'https://fnchqgqkfnyhzgnsvlnw.supabase.co')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY', 'sb_publishable_xWjg_QcyNhOwht9-sPDqkw_D2Vg8z2I')
 SUPABASE_MEDIA_BUCKET = 'media'
+SUPABASE_STATIC_BUCKET = 'static'
 SUPABASE_STORAGE_TRUST_FILE_EXTENSION_CONTENT_TYPE = True
 
 STORAGES = {
@@ -104,8 +105,6 @@ STORAGES = {
     },
 }
 
-SUPABASE_STATIC_BUCKET = 'static'
-
 MEDIA_URL = '/media/'
 # ==========================================
 
@@ -113,7 +112,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 # ==========================================
-# НАСТРОЙКИ CORS (ИСПРАВЛЕНЫ)
+# НАСТРОЙКИ CORS
 # ==========================================
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
@@ -122,7 +121,6 @@ CORS_ALLOWED_ORIGINS = [
     'https://www.ziptap.ru',
 ]
 
-# На случай, если ты передаешь через env переменные
 env_cors = os.getenv('CORS_ALLOWED_ORIGINS')
 if env_cors:
     CORS_ALLOWED_ORIGINS.extend(env_cors.split(','))
@@ -168,5 +166,3 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
-    
-# Авторские права: Крымская Жазгул Темеркановна (в девичестве Эсеналиева)
