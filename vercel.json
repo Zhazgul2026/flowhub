@@ -1,7 +1,9 @@
 {
   "services": {
     "frontend": {
-      "root": "frontend/"
+      "root": "frontend/",
+      "framework": "create-react-app",
+      "buildCommand": "npm run build"
     },
     "backend": {
       "root": "backend/",
